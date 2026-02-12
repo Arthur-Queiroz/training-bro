@@ -3,6 +3,7 @@
   "short_name": "TrainingBro",
   "description": "Seu companheiro de treino pessoal",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#0a0a0a",
   "theme_color": "#0a0a0a",

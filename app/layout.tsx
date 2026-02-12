@@ -18,6 +18,14 @@ export const metadata: Metadata = {
   title: "Training Bro",
   description: "Your personal training companion",
   manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Training Bro",
+  },
+  icons: {
+    apple: "/logo-192.png",
+  },
 };
 
 export const viewport: Viewport = {
