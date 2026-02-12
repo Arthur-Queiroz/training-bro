@@ -1,4 +1,4 @@
-const CACHE_NAME = "training-bro-v2";
+const CACHE_NAME = "training-bro-v3";
 const STATIC_ASSETS = ["/manifest.json", "/logo-png.png", "/logo-192.png"];
 
 self.addEventListener("install", (event) => {
@@ -32,6 +32,7 @@ self.addEventListener("fetch", (event) => {
     url.pathname.startsWith("/api") ||
     url.hostname.includes("clerk")
   ) {
+    event.respondWith(fetch(event.request));
     return;
   }
 
