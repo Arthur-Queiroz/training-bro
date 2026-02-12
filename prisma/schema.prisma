@@ -1,0 +1,37 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Workout {
+  id           String     @id @default(uuid()) @db.Uuid
+  clerkUserId  String     @map("clerk_user_id")
+  name         String
+  muscleGroups String[]   @map("muscle_groups")
+  createdAt    DateTime   @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt    DateTime   @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+  exercises    Exercise[]
+
+  @@index([clerkUserId])
+  @@map("workouts")
+}
+
+model Exercise {
+  id             String  @id @default(uuid()) @db.Uuid
+  workoutId      String  @map("workout_id") @db.Uuid
+  name           String
+  sets           Int
+  reps           Int
+  videoUrl       String? @map("video_url")
+  instructionUrl String? @map("instruction_url")
+  sortOrder      Int     @default(0) @map("sort_order")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
+  workout        Workout  @relation(fields: [workoutId], references: [id], onDelete: Cascade)
+
+  @@index([workoutId])
+  @@map("exercises")
+}
