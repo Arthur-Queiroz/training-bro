@@ -1,6 +1,7 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
+import { SWRegister } from "@/components/sw-register";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -17,6 +18,9 @@ export const metadata: Metadata = {
   title: "Training Bro",
   description: "Your personal training companion",
   manifest: "/manifest.json",
+};
+
+export const viewport: Viewport = {
   themeColor: "#0a0a0a",
 };
 
@@ -32,6 +36,7 @@ export default function RootLayout({
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
           {children}
+          <SWRegister />
         </body>
       </html>
     </ClerkProvider>
