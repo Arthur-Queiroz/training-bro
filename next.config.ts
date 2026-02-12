@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+// @ts-ignore - next-pwa has no type declarations
 import withPWAInit from "next-pwa";
 
 const withPWA = withPWAInit({
@@ -12,5 +13,5 @@ const nextConfig: NextConfig = {
   // Silencia o erro do turbopack/webpack
   turbopack: {},
 };
-// @ts-expect-error - next-pwa type
+// @ts-ignore - next-pwa type mismatch
 export default withPWA(nextConfig);
