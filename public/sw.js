@@ -1,4 +1,4 @@
-const CACHE_NAME = "training-bro-v3";
+const CACHE_NAME = "training-bro-v4";
 const STATIC_ASSETS = ["/manifest.json", "/logo-png.png", "/logo-192.png"];
 
 self.addEventListener("install", (event) => {
@@ -24,13 +24,14 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   const url = new URL(event.request.url);
 
-  // Never cache: non-GET, auth routes, clerk, API calls
+  // Never cache: non-GET, auth routes, clerk, API calls, HTML pages
   if (
     event.request.method !== "GET" ||
     url.pathname.startsWith("/sign-in") ||
     url.pathname.startsWith("/sign-up") ||
     url.pathname.startsWith("/api") ||
-    url.hostname.includes("clerk")
+    url.hostname.includes("clerk") ||
+    event.request.headers.get("accept")?.includes("text/html")
   ) {
     event.respondWith(fetch(event.request));
     return;
@@ -50,7 +51,7 @@ self.addEventListener("fetch", (event) => {
   event.respondWith(
     fetch(event.request)
       .then((response) => {
-        if (response.ok && response.type === "basic") {
+        if (response.ok && response.type === "basic" && !response.redirected) {
           const clone = response.clone();
           caches
             .open(CACHE_NAME)
