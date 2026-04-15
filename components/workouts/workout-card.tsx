@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getWorkoutPrimaryColor } from "@/lib/workout-colors";
 
 interface WorkoutCardProps {
   workout: {
@@ -11,32 +12,48 @@ interface WorkoutCardProps {
 
 export function WorkoutCard({ workout }: WorkoutCardProps) {
   const exerciseCount = workout.exercises?.length ?? 0;
+  const color = getWorkoutPrimaryColor(workout.muscleGroups);
 
   return (
     <Link
       href={`/workouts/${workout.id}`}
-      className="block rounded-lg border border-zinc-200 p-4 transition-colors hover:border-zinc-400 dark:border-zinc-700 dark:hover:border-zinc-500"
+      className="flex items-start gap-3 rounded-[10px] border border-white/[0.06] bg-[#141417] p-3 transition-colors hover:bg-[#1B1B1F]"
     >
-      <h3 className="text-lg font-semibold">{workout.name}</h3>
+      {/* Color dot */}
+      <span
+        className="mt-[3px] h-2 w-2 flex-shrink-0 rounded-full"
+        style={{ backgroundColor: color.solid }}
+      />
 
-      {workout.muscleGroups.length > 0 && (
-        <div className="mt-2 flex flex-wrap gap-1">
-          {workout.muscleGroups.map((group) => (
-            <span
-              key={group}
-              className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
-            >
-              {group}
-            </span>
-          ))}
-        </div>
-      )}
+      {/* Content */}
+      <div className="min-w-0 flex-1">
+        <p className="text-[13px] font-medium text-[#F0EDE6] leading-tight">
+          {workout.name}
+        </p>
 
-      <p className="mt-2 text-sm text-zinc-500">
-        {exerciseCount === 0
-          ? "Nenhum exercício cadastrado"
-          : `${exerciseCount} exercício${exerciseCount > 1 ? "s" : ""}`}
-      </p>
+        {workout.muscleGroups.length > 0 && (
+          <div className="mt-1.5 flex flex-wrap gap-1">
+            {workout.muscleGroups.map((group) => (
+              <span
+                key={group}
+                className="rounded-[8px] px-1.5 py-0.5 text-[11px] font-medium"
+                style={{
+                  backgroundColor: color.soft,
+                  color: color.solid,
+                }}
+              >
+                {group}
+              </span>
+            ))}
+          </div>
+        )}
+
+        <p className="mt-1.5 text-[11px] text-[#5E5C55]">
+          {exerciseCount === 0
+            ? "Nenhum exercício"
+            : `${exerciseCount} exercício${exerciseCount > 1 ? "s" : ""}`}
+        </p>
+      </div>
     </Link>
   );
 }

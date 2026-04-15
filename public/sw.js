@@ -1,5 +1,9 @@
-const CACHE_NAME = "training-bro-v4";
-const STATIC_ASSETS = ["/manifest.json", "/logo-png.png", "/logo-192.png"];
+const CACHE_NAME = "training-bro-v6";
+const STATIC_ASSETS = [
+  "/manifest.json",
+  "/training-bro-icon.png",
+  "/training-bro-icon-512.png",
+];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -24,16 +28,19 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   const url = new URL(event.request.url);
 
-  // Never cache: non-GET, auth routes, clerk, API calls, HTML pages
+  // Navigation requests (HTML pages) — NEVER intercept, let the browser handle normally
+  if (event.request.mode === "navigate") {
+    return;
+  }
+
+  // Never intercept: non-GET, auth routes, clerk, API calls
   if (
     event.request.method !== "GET" ||
     url.pathname.startsWith("/sign-in") ||
     url.pathname.startsWith("/sign-up") ||
     url.pathname.startsWith("/api") ||
-    url.hostname.includes("clerk") ||
-    event.request.headers.get("accept")?.includes("text/html")
+    url.hostname.includes("clerk")
   ) {
-    event.respondWith(fetch(event.request));
     return;
   }
 
@@ -47,7 +54,7 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Everything else: network-first, no caching of redirects/errors
+  // Everything else: network-first, only cache safe responses
   event.respondWith(
     fetch(event.request)
       .then((response) => {

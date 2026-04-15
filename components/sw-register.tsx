@@ -14,8 +14,16 @@ export function SWRegister() {
 
   useEffect(() => {
     if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("/sw.js").catch((err) => {
-        console.error("SW registration failed:", err);
+      // Force update: unregister any existing SW, clear caches, then re-register
+      navigator.serviceWorker.getRegistrations().then((registrations) => {
+        const updatePromises = registrations.map((reg) => reg.update());
+        Promise.all(updatePromises).then(() => {
+          navigator.serviceWorker
+            .register("/sw.js", { updateViaCache: "none" })
+            .catch((err) => {
+              console.error("SW registration failed:", err);
+            });
+        });
       });
     }
 
