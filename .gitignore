@@ -40,4 +40,10 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# Windows reserved device name (created accidentally)
+nul
+
 /lib/generated/prisma
+
+.vercel
+.env*.local
