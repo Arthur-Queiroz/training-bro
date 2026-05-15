@@ -91,15 +91,15 @@ export default async function WorkoutDetailPage({
         <div className="flex gap-2">
           <Link
             href={`/workouts/${workoutId}/edit`}
-            className="flex-1 rounded-[8px] border border-white/[0.06] bg-[#141417] py-2.5 text-center text-[13px] font-medium text-[#F0EDE6] transition-colors hover:bg-[#1B1B1F]"
+            className="rounded-[8px] border border-white/[0.06] bg-[#141417] px-4 py-2.5 text-center text-[13px] font-medium text-[#F0EDE6] transition-colors hover:bg-[#1B1B1F]"
           >
             Editar
           </Link>
           <Link
-            href={`/workouts/${workoutId}/exercises/new`}
+            href={`/workouts/${workoutId}/session`}
             className="flex-1 rounded-[8px] bg-[#E8612B] py-2.5 text-center text-[13px] font-medium text-white transition-colors hover:bg-[#D4511F]"
           >
-            Iniciar
+            Iniciar treino
           </Link>
         </div>
       </div>

@@ -3,7 +3,10 @@
     "allow": [
       "mcp__acp__Write",
       "mcp__acp__Edit",
-      "mcp__acp__Bash"
+      "mcp__acp__Bash",
+      "Bash(nslookup aws-1-us-east-1.pooler.supabase.com)",
+      "Bash(npx prisma *)",
+      "Bash(mkdir -p /c/prog/training-bro/app/workouts/[workoutId]/session)"
     ]
   }
 }
