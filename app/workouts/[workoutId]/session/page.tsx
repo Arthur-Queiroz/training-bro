@@ -21,6 +21,8 @@ export default async function WorkoutSessionPage({
         name: e.name,
         sets: e.sets,
         reps: e.reps,
+        videoUrl: e.videoUrl ?? null,
+        instructionUrl: e.instructionUrl ?? null,
       }))}
       color={color}
     />

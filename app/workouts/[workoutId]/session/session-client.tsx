@@ -9,6 +9,8 @@ interface Exercise {
   name: string;
   sets: number;
   reps: number;
+  videoUrl: string | null;
+  instructionUrl: string | null;
 }
 
 interface Props {
@@ -150,6 +152,40 @@ export function WorkoutSessionClient({
                   >
                     {exercise.sets}×{exercise.reps}
                   </span>
+
+                  {/* Video / Instruction links */}
+                  {(exercise.videoUrl || exercise.instructionUrl) && (
+                    <div className="flex gap-1.5 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
+                      {exercise.videoUrl && (
+                        <a
+                          href={exercise.videoUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex h-7 w-7 items-center justify-center rounded-[6px] bg-[#1B1B1F] text-[#9B978E] transition-colors hover:text-[#F0EDE6]"
+                          title="Ver vídeo"
+                        >
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <polygon points="5 3 19 12 5 21 5 3" />
+                          </svg>
+                        </a>
+                      )}
+                      {exercise.instructionUrl && (
+                        <a
+                          href={exercise.instructionUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex h-7 w-7 items-center justify-center rounded-[6px] bg-[#1B1B1F] text-[#9B978E] transition-colors hover:text-[#F0EDE6]"
+                          title="Ver instruções"
+                        >
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <circle cx="12" cy="12" r="10" />
+                            <line x1="12" y1="8" x2="12" y2="12" />
+                            <line x1="12" y1="16" x2="12.01" y2="16" />
+                          </svg>
+                        </a>
+                      )}
+                    </div>
+                  )}
                 </button>
               );
             })}
