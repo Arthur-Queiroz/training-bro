@@ -2,6 +2,9 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   turbopack: {},
+  images: {
+    remotePatterns: [{ hostname: "img.clerk.com" }],
+  },
   headers: async () => [
     {
       source: "/sign-in/:path*",

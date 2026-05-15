@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { SignOutButton } from "@clerk/nextjs";
 
@@ -8,6 +9,7 @@ interface SidebarProps {
   userInfo: {
     firstName: string;
     initials: string;
+    imageUrl: string | null;
     plan: string;
   } | null;
 }
@@ -57,8 +59,8 @@ export function Sidebar({ userInfo }: SidebarProps) {
         <Link href="/" className="flex items-center gap-2">
           <div className="flex h-7 w-7 items-center justify-center rounded-[7px] bg-[#E8612B]">
             <svg
-              width="14"
-              height="14"
+              width="15"
+              height="15"
               viewBox="0 0 24 24"
               fill="none"
               stroke="white"
@@ -66,7 +68,9 @@ export function Sidebar({ userInfo }: SidebarProps) {
               strokeLinecap="round"
               strokeLinejoin="round"
             >
-              <path d="M6 4v16M18 4v16M6 12h12" />
+              <path d="M6 4v16M18 4v16" strokeWidth="3" />
+              <path d="M3 9v6M21 9v6" strokeWidth="3" />
+              <path d="M6 12h12" />
             </svg>
           </div>
           <span
@@ -110,8 +114,12 @@ export function Sidebar({ userInfo }: SidebarProps) {
       {userInfo && (
         <div className="border-t border-white/[0.06] p-3">
           <div className="flex items-center gap-2.5 rounded-[8px] bg-[#141417] p-2">
-            <div className="flex h-[30px] w-[30px] flex-shrink-0 items-center justify-center rounded-full bg-[#E8612B] text-[12px] font-medium text-white">
-              {userInfo.initials}
+            <div className="flex h-[30px] w-[30px] flex-shrink-0 items-center justify-center rounded-full bg-[#E8612B] text-[12px] font-medium text-white overflow-hidden">
+              {userInfo.imageUrl ? (
+                <Image src={userInfo.imageUrl} alt="Perfil" width={30} height={30} className="object-cover w-full h-full" />
+              ) : (
+                userInfo.initials
+              )}
             </div>
             <div className="min-w-0 flex-1">
               <p className="truncate text-[12px] font-medium text-[#F0EDE6]">

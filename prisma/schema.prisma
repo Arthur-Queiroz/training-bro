@@ -8,16 +8,29 @@ datasource db {
 }
 
 model Workout {
-  id           String     @id @default(uuid()) @db.Uuid
-  clerkUserId  String     @map("clerk_user_id")
+  id           String           @id @default(uuid()) @db.Uuid
+  clerkUserId  String           @map("clerk_user_id")
   name         String
-  muscleGroups String[]   @map("muscle_groups")
-  createdAt    DateTime   @default(now()) @map("created_at") @db.Timestamptz
-  updatedAt    DateTime   @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+  muscleGroups String[]         @map("muscle_groups")
+  createdAt    DateTime         @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt    DateTime         @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
   exercises    Exercise[]
+  sessions     WorkoutSession[]
 
   @@index([clerkUserId])
   @@map("workouts")
+}
+
+model WorkoutSession {
+  id          String   @id @default(uuid()) @db.Uuid
+  clerkUserId String   @map("clerk_user_id")
+  workoutId   String   @map("workout_id") @db.Uuid
+  performedAt DateTime @default(now()) @map("performed_at") @db.Timestamptz
+  workout     Workout  @relation(fields: [workoutId], references: [id], onDelete: Cascade)
+
+  @@index([clerkUserId])
+  @@index([workoutId])
+  @@map("workout_sessions")
 }
 
 model Exercise {
