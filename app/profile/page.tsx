@@ -1,6 +1,8 @@
 import { currentUser } from "@clerk/nextjs/server";
 import { getWorkouts } from "@/lib/actions/workouts";
 import { SignOutButton } from "@clerk/nextjs";
+import Link from "next/link";
+import Image from "next/image";
 
 const MONTHS_PT = [
   "jan", "fev", "mar", "abr", "mai", "jun",
@@ -26,8 +28,12 @@ export default async function ProfilePage() {
 
       {/* Avatar + name */}
       <div className="flex flex-col items-center text-center mb-5">
-        <div className="flex h-[52px] w-[52px] items-center justify-center rounded-full bg-[#E8612B] text-[20px] font-medium text-white mb-3">
-          {initials}
+        <div className="flex h-[52px] w-[52px] items-center justify-center rounded-full bg-[#E8612B] text-[20px] font-medium text-white mb-3 overflow-hidden">
+          {user?.imageUrl ? (
+            <Image src={user.imageUrl} alt="Perfil" width={52} height={52} className="object-cover w-full h-full" />
+          ) : (
+            initials
+          )}
         </div>
         <p className="text-[15px] font-medium text-[#F0EDE6]">{firstName}</p>
         <p className="text-[11px] text-[#5E5C55] mt-0.5">
@@ -51,12 +57,16 @@ export default async function ProfilePage() {
 
       {/* Menu items */}
       <div className="rounded-[10px] border border-white/[0.06] bg-[#141417] divide-y divide-white/[0.06] mb-4">
-        {[
-          "Dados pessoais",
-          "Notificações",
-          "Aparência",
-          "Sobre o app",
-        ].map((item) => (
+        <Link
+          href="/profile/dados-pessoais"
+          className="flex w-full items-center justify-between px-4 py-3 text-[13px] text-[#F0EDE6] transition-colors hover:bg-[#1B1B1F]"
+        >
+          Dados pessoais
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5E5C55" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="m9 18 6-6-6-6" />
+          </svg>
+        </Link>
+        {["Notificações", "Aparência", "Sobre o app"].map((item) => (
           <button
             key={item}
             className="flex w-full items-center justify-between px-4 py-3 text-[13px] text-[#F0EDE6] transition-colors hover:bg-[#1B1B1F]"

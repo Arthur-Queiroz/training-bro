@@ -47,6 +47,7 @@ export default async function RootLayout({
     ? {
         firstName: user.firstName ?? "Você",
         initials: (user.firstName?.[0] ?? "A").toUpperCase(),
+        imageUrl: user.imageUrl ?? null,
         plan: "Plano free",
       }
     : null;
