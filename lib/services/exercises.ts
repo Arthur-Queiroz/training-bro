@@ -1,6 +1,27 @@
 import { prisma } from "@/lib/prisma";
 import { NotFoundError, ValidationError } from "@/lib/errors";
 
+/**
+ * Normaliza um link opcional: vazio vira null; se presente, só aceita
+ * http(s) — bloqueia esquemas perigosos como javascript:, que seriam
+ * renderizados em <a href> na UI.
+ */
+function normalizeLinkUrl(value: string | null | undefined): string | null {
+  const trimmed = value?.trim();
+  if (!trimmed) return null;
+
+  let parsed: URL;
+  try {
+    parsed = new URL(trimmed);
+  } catch {
+    throw new ValidationError("Link inválido: use uma URL completa");
+  }
+  if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+    throw new ValidationError("Link inválido: só são aceitos http(s)");
+  }
+  return trimmed;
+}
+
 export interface CreateExerciseInput {
   name: string;
   sets: number;
@@ -40,8 +61,8 @@ export async function createExercise(
       name: input.name.trim(),
       sets: input.sets,
       reps: input.reps,
-      videoUrl: input.videoUrl?.trim() || null,
-      instructionUrl: input.instructionUrl?.trim() || null,
+      videoUrl: normalizeLinkUrl(input.videoUrl),
+      instructionUrl: normalizeLinkUrl(input.instructionUrl),
       sortOrder: nextOrder,
     },
   });
@@ -102,10 +123,10 @@ export async function updateExercise(
       ...(input.sets !== undefined && { sets: input.sets }),
       ...(input.reps !== undefined && { reps: input.reps }),
       ...(input.videoUrl !== undefined && {
-        videoUrl: input.videoUrl?.trim() || null,
+        videoUrl: normalizeLinkUrl(input.videoUrl),
       }),
       ...(input.instructionUrl !== undefined && {
-        instructionUrl: input.instructionUrl?.trim() || null,
+        instructionUrl: normalizeLinkUrl(input.instructionUrl),
       }),
     },
   });
