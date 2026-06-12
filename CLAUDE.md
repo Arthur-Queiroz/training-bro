@@ -14,6 +14,7 @@ revisão. Ao revisar um PR, compare contra a base com `git diff origin/main...HE
 
 ```
 app/                      # rotas (App Router). Páginas e layouts.
+  api/                    # API routes REST (auth → parse tipado → service → handleError)
   workouts/               # lista, criação, detalhe, edição de treinos
     [workoutId]/          # rota dinâmica de um treino + seus exercícios
 components/
@@ -22,32 +23,42 @@ components/
 lib/
   prisma.ts               # singleton do Prisma client
   constants.ts            # grupos musculares e constantes de domínio
-  actions/
-    workouts.ts           # Server Actions — CRUD de treinos
-    exercises.ts          # Server Actions — CRUD de exercícios
+  services/
+    workouts.ts           # lógica de negócio — CRUD de treinos
+    exercises.ts          # lógica de negócio — CRUD de exercícios
+    sessions.ts           # lógica de negócio — sessões de treino
+  errors.ts               # erros de domínio (ValidationError, NotFoundError)
+  parse-body.ts           # parsing tipado do corpo JSON na fronteira HTTP
+  api-response.ts         # helpers de resposta (ok/err) + handleError
+middleware.ts             # clerkMiddleware (protege tudo exceto /sign-in e /sign-up)
 prisma/
   schema.prisma           # schema do banco
 ```
 
 Regra de ouro de localização:
-- **Dados e regras de negócio** → `lib/actions/` (server) e `lib/` (helpers).
+- **Regras de negócio** → `lib/services/`. Services recebem `userId` como parâmetro,
+  não conhecem HTTP e lançam erros de domínio (`lib/errors.ts`).
+- **Fronteira HTTP** → `app/api/`. Routes só fazem: auth → parse tipado → service
+  → resposta. Nada de regra de negócio em route.
 - **UI e interação** → `components/` e `app/`.
-- Acesso ao Prisma acontece SOMENTE no servidor, nunca a partir de componente client.
+- Acesso ao Prisma acontece SOMENTE no servidor (services), nunca a partir de
+  componente client. Server Components importam services direto (sem round-trip
+  HTTP); componentes client chamam as API routes via `fetch()`.
 
 ## Princípio central: lógica de negócio NÃO vive no frontend
 
 O problema recorrente deste projeto é empurrar responsabilidade pro client.
 Trate o seguinte como violação a ser corrigida:
 
-- **Cálculos, validações e regras de negócio devem estar em Server Actions**
-  (`lib/actions/`), não em componentes client. Componente client cuida de UI,
-  estado de tela e interação — não de regra de negócio.
+- **Cálculos, validações e regras de negócio devem estar nos services**
+  (`lib/services/`), não em componentes client nem em API routes. Componente
+  client cuida de UI, estado de tela e interação — não de regra de negócio.
 - **Validação de dados** roda no servidor antes de tocar o banco, sempre. Validação
   no client é só UX (feedback rápido), nunca a única barreira.
 - **`"use client"` é exceção, não padrão.** Se o componente não precisa de estado,
   efeito, ou evento de browser, ele deve ser Server Component.
 - **Nenhuma query Prisma partindo do client.** Se você vê acesso a dados num
-  componente client, mova pra uma Server Action.
+  componente client, mova pra um service exposto por uma API route.
 
 ## TypeScript — boas práticas obrigatórias
 
@@ -65,29 +76,45 @@ Trate o seguinte como violação a ser corrigida:
 - **Null vs undefined:** seja consistente. Campos opcionais do banco geralmente são
   `null`; estado de UI ainda não preenchido geralmente é `undefined`. Não misture.
 
-## Server Actions — convenções
+## Services e API routes — convenções
 
-- Cada action faz uma operação. Se uma action faz fetch + validação +
+- Cada service faz uma operação. Se uma função faz fetch + validação +
   transformação + side effect tudo junto, separe em funções nomeadas em `lib/`.
-- **Sempre autentique.** Toda action que lê/escreve dados do usuário valida a sessão
-  via Clerk e garante que o recurso pertence ao usuário logado (sem isso, qualquer
-  um edita treino dos outros).
-- **Retorno consistente em caso de erro.** Use um shape previsível
-  (ex: `{ ok: false, error: string }` / `{ ok: true, data }`) em vez de deixar
-  exceções estourarem cruas no client.
+- **Sempre autentique e verifique ownership.** Toda route valida a sessão via
+  Clerk (`auth()`) e todo service escopa as queries pelo `clerkUserId` recebido,
+  garantindo que o recurso pertence ao usuário logado (sem isso, qualquer um
+  edita treino dos outros). Há testes de regressão disso em `lib/services/*.test.ts`.
+- **Erros tipados.** Services lançam `ValidationError`/`NotFoundError`
+  (`lib/errors.ts`); routes convertem com `handleError()` (`lib/api-response.ts`)
+  para 400/404, e erro inesperado vira 500 genérico sem vazar detalhes.
+- **Resposta consistente:** `{ ok: true, data }` / `{ ok: false, error }` via
+  helpers `ok()`/`err()`. Nunca monte o JSON de resposta na mão.
+- **Corpo da requisição é `unknown`.** Converta com os helpers de
+  `lib/parse-body.ts` antes de passar ao service. Nada de `await request.json()`
+  usado direto.
 - **Revalidação:** após mutação, revalide o path/tag afetado para a UI refletir.
 - Não repita lógica de CRUD entre `workouts.ts` e `exercises.ts`; extraia o que
   for comum.
 
+## Testes
+
+- Suíte em Vitest (`npm test`), sem banco — o Prisma é mockado via `vi.mock`.
+- Toda mudança em service deve manter/estender os testes de ownership
+  (anti-IDOR) e de validação correspondentes.
+- CI (GitHub Actions) roda typecheck, lint e testes em todo PR.
+
 ## React / Next.js
 
 - Server Component é o padrão; só marque `"use client"` quando realmente precisar.
-- Não faça data fetching em `useEffect` quando um Server Component ou Server Action
-  resolve. Busque no servidor e passe via props.
+- Não faça data fetching em `useEffect` quando um Server Component resolve.
+  Busque no servidor (importando o service) e passe via props.
 - Componentes de `components/workouts` e `components/exercises` devem ser
   apresentacionais sempre que possível — recebem dados prontos, não buscam.
-- Forms usam Server Actions diretamente (action={...}) em vez de handlers client
-  que chamam fetch manual, salvo quando há interação rica que exige client.
+- Forms client chamam as API routes via `fetch()` e, após mutação com navegação,
+  usam `router.push()` + `router.refresh()` para a UI refletir o novo estado.
+- Páginas que carregam um recurso por id devem responder 404 de verdade
+  (`notFound()` do `next/navigation`) quando o service lança `NotFoundError` —
+  use o helper `or404()` de `lib/or-404.ts`.
 
 ## Sem over-engineering
 
@@ -100,4 +127,4 @@ Trate o seguinte como violação a ser corrigida:
 Corrija diretamente no código. Faça commit na branch do PR e dê push. No comentário
 do PR, liste cada problema encontrado e como foi corrigido, agrupado por arquivo.
 Seja específico: ao mover "lógica do frontend", diga o que era, de qual componente
-saiu, e pra qual action/helper foi.
+saiu, e pra qual service/helper foi.

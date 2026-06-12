@@ -114,11 +114,12 @@ export function ExerciseForm({ workoutId, exercise }: ExerciseFormProps) {
           Link de Vídeo <span className="text-zinc-400">(opcional)</span>
         </label>
         <input
-          type="url"
+          type="text"
+          inputMode="url"
           id="video_url"
           name="video_url"
           defaultValue={exercise?.videoUrl ?? ""}
-          placeholder="https://youtube.com/..."
+          placeholder="youtube.com/..."
           className="w-full rounded-lg border border-zinc-300 bg-transparent px-3 py-2 text-sm outline-none focus:border-zinc-500 dark:border-zinc-600 dark:focus:border-zinc-400"
         />
       </div>
@@ -131,11 +132,12 @@ export function ExerciseForm({ workoutId, exercise }: ExerciseFormProps) {
           Link de Instruções <span className="text-zinc-400">(opcional)</span>
         </label>
         <input
-          type="url"
+          type="text"
+          inputMode="url"
           id="instruction_url"
           name="instruction_url"
           defaultValue={exercise?.instructionUrl ?? ""}
-          placeholder="https://..."
+          placeholder="exemplo.com/..."
           className="w-full rounded-lg border border-zinc-300 bg-transparent px-3 py-2 text-sm outline-none focus:border-zinc-500 dark:border-zinc-600 dark:focus:border-zinc-400"
         />
       </div>

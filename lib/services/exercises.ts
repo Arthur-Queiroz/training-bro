@@ -2,24 +2,28 @@ import { prisma } from "@/lib/prisma";
 import { NotFoundError, ValidationError } from "@/lib/errors";
 
 /**
- * Normaliza um link opcional: vazio vira null; se presente, só aceita
- * http(s) — bloqueia esquemas perigosos como javascript:, que seriam
- * renderizados em <a href> na UI.
+ * Normaliza um link opcional: vazio vira null; sem esquema ganha https://
+ * (ex: "youtube.com/x" → "https://youtube.com/x"); só aceita http(s) —
+ * bloqueia esquemas perigosos como javascript:, que seriam renderizados
+ * em <a href> na UI.
  */
 function normalizeLinkUrl(value: string | null | undefined): string | null {
   const trimmed = value?.trim();
   if (!trimmed) return null;
 
+  const hasScheme = /^[a-z][a-z0-9+.-]*:/i.test(trimmed);
+  const candidate = hasScheme ? trimmed : `https://${trimmed}`;
+
   let parsed: URL;
   try {
-    parsed = new URL(trimmed);
+    parsed = new URL(candidate);
   } catch {
     throw new ValidationError("Link inválido: use uma URL completa");
   }
   if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
     throw new ValidationError("Link inválido: só são aceitos http(s)");
   }
-  return trimmed;
+  return candidate;
 }
 
 export interface CreateExerciseInput {

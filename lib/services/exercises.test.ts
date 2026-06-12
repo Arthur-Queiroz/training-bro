@@ -68,7 +68,7 @@ describe("createExercise", () => {
   it.each([
     ["javascript: (XSS)", "javascript:alert(1)"],
     ["data:", "data:text/html,<script>alert(1)</script>"],
-    ["não-URL", "youtube.com/watch"],
+    ["URL malformada", "you tube .com"],
   ])("rejeita link com esquema perigoso ou inválido: %s", async (_l, url) => {
     mockedWorkout.findFirst.mockResolvedValue({ id: "w1" } as never);
     mockedExercise.findFirst.mockResolvedValue(null);
@@ -85,6 +85,21 @@ describe("createExercise", () => {
     await createExercise("user_1", "w1", {
       ...validInput,
       videoUrl: "https://youtube.com/watch?v=abc",
+    });
+    expect(mockedExercise.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        videoUrl: "https://youtube.com/watch?v=abc",
+      }),
+    });
+  });
+
+  it("link sem esquema ganha https:// automaticamente", async () => {
+    mockedWorkout.findFirst.mockResolvedValue({ id: "w1" } as never);
+    mockedExercise.findFirst.mockResolvedValue(null);
+    mockedExercise.create.mockResolvedValue({ id: "e1" } as never);
+    await createExercise("user_1", "w1", {
+      ...validInput,
+      videoUrl: "youtube.com/watch?v=abc",
     });
     expect(mockedExercise.create).toHaveBeenCalledWith({
       data: expect.objectContaining({

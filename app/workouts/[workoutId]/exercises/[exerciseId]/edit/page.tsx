@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
 import { getExercise } from "@/lib/services/exercises";
+import { or404 } from "@/lib/or-404";
 import { ExerciseForm } from "@/components/exercises/exercise-form";
 
 export default async function EditExercisePage({
@@ -12,7 +13,7 @@ export default async function EditExercisePage({
   if (!userId) throw new Error("Não autenticado");
 
   const { workoutId, exerciseId } = await params;
-  const exercise = await getExercise(userId, exerciseId);
+  const exercise = await or404(getExercise(userId, exerciseId));
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-8">
