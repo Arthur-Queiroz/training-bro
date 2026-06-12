@@ -15,9 +15,11 @@ const DAYS_PT = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
 
 export default async function Home() {
   const user = await currentUser();
+  if (!user) throw new Error("Não autenticado");
+
   const [workouts, sessionsThisWeek] = await Promise.all([
-    listWorkouts(user!.id),
-    getSessionsThisWeek(user!.id),
+    listWorkouts(user.id),
+    getSessionsThisWeek(user.id),
   ]);
 
   const now = new Date();

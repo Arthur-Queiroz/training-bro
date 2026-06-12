@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { NotFoundError, ValidationError } from "@/lib/errors";
 
 export async function listWorkouts(userId: string) {
   return prisma.workout.findMany({
@@ -14,7 +15,7 @@ export async function getWorkout(userId: string, id: string) {
     include: { exercises: { orderBy: { sortOrder: "asc" } } },
   });
 
-  if (!workout) throw new Error("Treino não encontrado");
+  if (!workout) throw new NotFoundError("Treino não encontrado");
   return workout;
 }
 
@@ -24,7 +25,7 @@ export interface CreateWorkoutInput {
 }
 
 export async function createWorkout(userId: string, input: CreateWorkoutInput) {
-  if (!input.name?.trim()) throw new Error("Nome do treino é obrigatório");
+  if (!input.name.trim()) throw new ValidationError("Nome do treino é obrigatório");
 
   return prisma.workout.create({
     data: {
@@ -45,8 +46,8 @@ export async function updateWorkout(
   id: string,
   input: UpdateWorkoutInput,
 ) {
-  if (input.name !== undefined && !input.name?.trim()) {
-    throw new Error("Nome do treino é obrigatório");
+  if (input.name !== undefined && !input.name.trim()) {
+    throw new ValidationError("Nome do treino é obrigatório");
   }
 
   return prisma.workout.updateMany({

@@ -1,7 +1,13 @@
 import { auth } from "@clerk/nextjs/server";
-import { createExercise } from "@/lib/services/exercises";
-import { ok, err, unauthorized } from "@/lib/api-response";
 import { revalidatePath } from "next/cache";
+import { createExercise } from "@/lib/services/exercises";
+import { ok, unauthorized, handleError } from "@/lib/api-response";
+import {
+  readJsonObject,
+  asString,
+  asNumber,
+  asNullableString,
+} from "@/lib/parse-body";
 
 export async function POST(
   request: Request,
@@ -11,26 +17,19 @@ export async function POST(
   if (!userId) return unauthorized();
 
   const { workoutId } = await params;
-  const body = await request.json();
-  const { name, sets, reps, videoUrl, instructionUrl } = body;
-
-  if (!name?.trim()) return err("Nome do exercício é obrigatório");
-  if (!sets || sets <= 0) return err("Séries deve ser maior que zero");
-  if (!reps || reps <= 0) return err("Repetições deve ser maior que zero");
 
   try {
+    const body = await readJsonObject(request);
     const exercise = await createExercise(userId, workoutId, {
-      name,
-      sets,
-      reps,
-      videoUrl: videoUrl || null,
-      instructionUrl: instructionUrl || null,
+      name: asString(body.name),
+      sets: asNumber(body.sets),
+      reps: asNumber(body.reps),
+      videoUrl: asNullableString(body.videoUrl),
+      instructionUrl: asNullableString(body.instructionUrl),
     });
     revalidatePath(`/workouts/${workoutId}`);
     return ok(exercise, 201);
   } catch (e) {
-    return err(
-      e instanceof Error ? e.message : "Erro ao criar exercício",
-    );
+    return handleError(e);
   }
 }

@@ -1,33 +1,33 @@
 import { auth } from "@clerk/nextjs/server";
-import { listWorkouts, createWorkout } from "@/lib/services/workouts";
-import { ok, err, unauthorized } from "@/lib/api-response";
 import { revalidatePath } from "next/cache";
+import { listWorkouts, createWorkout } from "@/lib/services/workouts";
+import { ok, unauthorized, handleError } from "@/lib/api-response";
+import {
+  readJsonObject,
+  asString,
+  asOptionalStringArray,
+} from "@/lib/parse-body";
 
 export async function GET() {
   const { userId } = await auth();
   if (!userId) return unauthorized();
 
-  const workouts = await listWorkouts(userId);
-  return ok(workouts);
+  return ok(await listWorkouts(userId));
 }
 
 export async function POST(request: Request) {
   const { userId } = await auth();
   if (!userId) return unauthorized();
 
-  const body = await request.json();
-  const { name, muscleGroups } = body;
-
-  if (!name?.trim()) return err("Nome do treino é obrigatório");
-
   try {
+    const body = await readJsonObject(request);
     const workout = await createWorkout(userId, {
-      name,
-      muscleGroups: muscleGroups ?? [],
+      name: asString(body.name),
+      muscleGroups: asOptionalStringArray(body.muscleGroups) ?? [],
     });
     revalidatePath("/workouts");
     return ok(workout, 201);
   } catch (e) {
-    return err(e instanceof Error ? e.message : "Erro ao criar treino");
+    return handleError(e);
   }
 }

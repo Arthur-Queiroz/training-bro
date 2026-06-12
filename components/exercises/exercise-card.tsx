@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 interface ExerciseCardProps {
   exercise: {
@@ -19,6 +20,7 @@ interface ExerciseCardProps {
 }
 
 export function ExerciseCard({ exercise, workoutId, index }: ExerciseCardProps) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -42,8 +44,11 @@ export function ExerciseCard({ exercise, workoutId, index }: ExerciseCardProps) 
         { method: "DELETE" },
       );
       if (!res.ok) throw new Error("Erro ao excluir");
+      setOpen(false);
+      router.refresh();
     } catch {
       alert("Erro ao excluir exercício.");
+      setDeleting(false);
     }
   }
 

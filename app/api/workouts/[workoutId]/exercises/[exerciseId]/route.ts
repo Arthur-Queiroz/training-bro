@@ -1,7 +1,13 @@
 import { auth } from "@clerk/nextjs/server";
-import { updateExercise, deleteExercise } from "@/lib/services/exercises";
-import { ok, err, unauthorized, notFound } from "@/lib/api-response";
 import { revalidatePath } from "next/cache";
+import { updateExercise, deleteExercise } from "@/lib/services/exercises";
+import { ok, unauthorized, handleError } from "@/lib/api-response";
+import {
+  readJsonObject,
+  asOptionalString,
+  asOptionalNumber,
+  asNullableString,
+} from "@/lib/parse-body";
 
 export async function PATCH(
   request: Request,
@@ -11,23 +17,20 @@ export async function PATCH(
   if (!userId) return unauthorized();
 
   const { workoutId, exerciseId } = await params;
-  const body = await request.json();
 
   try {
-    const exercise = await updateExercise(userId, exerciseId, {
-      ...body,
-      videoUrl: body.videoUrl ?? null,
-      instructionUrl: body.instructionUrl ?? null,
+    const body = await readJsonObject(request);
+    await updateExercise(userId, exerciseId, {
+      name: asOptionalString(body.name),
+      sets: asOptionalNumber(body.sets),
+      reps: asOptionalNumber(body.reps),
+      videoUrl: asNullableString(body.videoUrl),
+      instructionUrl: asNullableString(body.instructionUrl),
     });
     revalidatePath(`/workouts/${workoutId}`);
-    return ok(exercise);
+    return ok({ updated: true });
   } catch (e) {
-    if (e instanceof Error && e.message === "Exercício não encontrado") {
-      return notFound(e.message);
-    }
-    return err(
-      e instanceof Error ? e.message : "Erro ao atualizar exercício",
-    );
+    return handleError(e);
   }
 }
 
@@ -45,8 +48,6 @@ export async function DELETE(
     revalidatePath(`/workouts/${workoutId}`);
     return ok({ deleted: true });
   } catch (e) {
-    return err(
-      e instanceof Error ? e.message : "Erro ao excluir exercício",
-    );
+    return handleError(e);
   }
 }

@@ -1,7 +1,16 @@
 import { auth } from "@clerk/nextjs/server";
-import { getWorkout, updateWorkout, deleteWorkout } from "@/lib/services/workouts";
-import { ok, err, unauthorized, notFound } from "@/lib/api-response";
 import { revalidatePath } from "next/cache";
+import {
+  getWorkout,
+  updateWorkout,
+  deleteWorkout,
+} from "@/lib/services/workouts";
+import { ok, unauthorized, handleError } from "@/lib/api-response";
+import {
+  readJsonObject,
+  asOptionalString,
+  asOptionalStringArray,
+} from "@/lib/parse-body";
 
 export async function GET(
   _request: Request,
@@ -13,13 +22,9 @@ export async function GET(
   const { workoutId } = await params;
 
   try {
-    const workout = await getWorkout(userId, workoutId);
-    return ok(workout);
+    return ok(await getWorkout(userId, workoutId));
   } catch (e) {
-    if (e instanceof Error && e.message === "Treino não encontrado") {
-      return notFound(e.message);
-    }
-    return err(e instanceof Error ? e.message : "Erro ao buscar treino");
+    return handleError(e);
   }
 }
 
@@ -31,15 +36,18 @@ export async function PATCH(
   if (!userId) return unauthorized();
 
   const { workoutId } = await params;
-  const body = await request.json();
 
   try {
-    const result = await updateWorkout(userId, workoutId, body);
+    const body = await readJsonObject(request);
+    await updateWorkout(userId, workoutId, {
+      name: asOptionalString(body.name),
+      muscleGroups: asOptionalStringArray(body.muscleGroups),
+    });
     revalidatePath("/workouts");
     revalidatePath(`/workouts/${workoutId}`);
-    return ok(result);
+    return ok({ updated: true });
   } catch (e) {
-    return err(e instanceof Error ? e.message : "Erro ao atualizar treino");
+    return handleError(e);
   }
 }
 
@@ -57,6 +65,6 @@ export async function DELETE(
     revalidatePath("/workouts");
     return ok({ deleted: true });
   } catch (e) {
-    return err(e instanceof Error ? e.message : "Erro ao excluir treino");
+    return handleError(e);
   }
 }

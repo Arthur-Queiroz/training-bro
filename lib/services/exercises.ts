@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { NotFoundError, ValidationError } from "@/lib/errors";
 
 export interface CreateExerciseInput {
   name: string;
@@ -16,13 +17,14 @@ export async function createExercise(
   const workout = await prisma.workout.findFirst({
     where: { id: workoutId, clerkUserId: userId },
   });
-  if (!workout) throw new Error("Treino não encontrado");
+  if (!workout) throw new NotFoundError("Treino não encontrado");
 
-  if (!input.name?.trim()) throw new Error("Nome do exercício é obrigatório");
-  if (!input.sets || input.sets <= 0)
-    throw new Error("Séries deve ser maior que zero");
-  if (!input.reps || input.reps <= 0)
-    throw new Error("Repetições deve ser maior que zero");
+  if (!input.name.trim())
+    throw new ValidationError("Nome do exercício é obrigatório");
+  if (input.sets <= 0)
+    throw new ValidationError("Séries deve ser maior que zero");
+  if (input.reps <= 0)
+    throw new ValidationError("Repetições deve ser maior que zero");
 
   const lastExercise = await prisma.exercise.findFirst({
     where: { workoutId },
@@ -50,12 +52,12 @@ export async function getExercise(userId: string, exerciseId: string) {
     where: { id: exerciseId },
   });
 
-  if (!exercise) throw new Error("Exercício não encontrado");
+  if (!exercise) throw new NotFoundError("Exercício não encontrado");
 
   const workout = await prisma.workout.findFirst({
     where: { id: exercise.workoutId, clerkUserId: userId },
   });
-  if (!workout) throw new Error("Exercício não encontrado");
+  if (!workout) throw new NotFoundError("Exercício não encontrado");
 
   return exercise;
 }
@@ -76,21 +78,21 @@ export async function updateExercise(
   const exercise = await prisma.exercise.findUnique({
     where: { id: exerciseId },
   });
-  if (!exercise) throw new Error("Exercício não encontrado");
+  if (!exercise) throw new NotFoundError("Exercício não encontrado");
 
   const workout = await prisma.workout.findFirst({
     where: { id: exercise.workoutId, clerkUserId: userId },
   });
-  if (!workout) throw new Error("Exercício não encontrado");
+  if (!workout) throw new NotFoundError("Exercício não encontrado");
 
-  if (input.name !== undefined && !input.name?.trim()) {
-    throw new Error("Nome do exercício é obrigatório");
+  if (input.name !== undefined && !input.name.trim()) {
+    throw new ValidationError("Nome do exercício é obrigatório");
   }
   if (input.sets !== undefined && input.sets <= 0) {
-    throw new Error("Séries deve ser maior que zero");
+    throw new ValidationError("Séries deve ser maior que zero");
   }
   if (input.reps !== undefined && input.reps <= 0) {
-    throw new Error("Repetições deve ser maior que zero");
+    throw new ValidationError("Repetições deve ser maior que zero");
   }
 
   return prisma.exercise.update({
@@ -117,7 +119,14 @@ export async function deleteExercise(
   const workout = await prisma.workout.findFirst({
     where: { id: workoutId, clerkUserId: userId },
   });
-  if (!workout) throw new Error("Treino não encontrado");
+  if (!workout) throw new NotFoundError("Treino não encontrado");
 
-  return prisma.exercise.delete({ where: { id: exerciseId } });
+  // Escopa a exclusão ao treino do usuário: garante que o exercício pertence a
+  // ESTE treino, e não a outro (possivelmente de outro usuário).
+  const result = await prisma.exercise.deleteMany({
+    where: { id: exerciseId, workoutId },
+  });
+  if (result.count === 0) throw new NotFoundError("Exercício não encontrado");
+
+  return result;
 }
