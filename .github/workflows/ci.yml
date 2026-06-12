@@ -20,8 +20,11 @@ jobs:
           node-version: 22
           cache: npm
 
+      # npm install em vez de npm ci: o lock é gerado no Windows e o npm omite
+      # entradas opcionais wasm de outras plataformas (npm/cli#4828), o que faz
+      # o npm ci falhar no runner Linux. npm install ainda respeita o lock.
       - name: Instalar dependências (roda prisma generate via postinstall)
-        run: npm ci
+        run: npm install --no-audit --no-fund
 
       - name: Typecheck
         run: npx tsc --noEmit
