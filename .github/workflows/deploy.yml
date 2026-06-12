@@ -1,3 +1,11 @@
+# Secrets usados (Settings → Secrets → Actions):
+#   VERCEL_TOKEN      — criado em 12/06/2026, EXPIRA EM ~12/06/2027.
+#                       Se os deploys começarem a falhar com erro de auth perto
+#                       dessa data, gere outro em vercel.com/account/tokens e
+#                       atualize com: gh secret set VERCEL_TOKEN
+#   VERCEL_ORG_ID / VERCEL_PROJECT_ID — de .vercel/project.json
+# As variáveis de ambiente da aplicação (Clerk, DATABASE_URL etc.) vivem no
+# projeto da Vercel e são baixadas pelo `vercel pull`.
 name: Deploy (Vercel)
 
 on:
