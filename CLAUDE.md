@@ -30,7 +30,9 @@ lib/
   errors.ts               # erros de domínio (ValidationError, NotFoundError)
   parse-body.ts           # parsing tipado do corpo JSON na fronteira HTTP
   api-response.ts         # helpers de resposta (ok/err) + handleError
-middleware.ts             # clerkMiddleware (protege tudo exceto /sign-in e /sign-up)
+proxy.ts                  # clerkMiddleware (protege tudo exceto /sign-in e /sign-up).
+                          # No Next 16 o middleware.ts foi renomeado para proxy.ts —
+                          # NÃO crie um middleware.ts, o build falha com os dois.
 prisma/
   schema.prisma           # schema do banco
 ```
