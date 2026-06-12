@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
-import { deleteExercise } from "@/lib/actions/exercises";
 
 interface ExerciseCardProps {
   exercise: {
@@ -21,6 +20,7 @@ interface ExerciseCardProps {
 
 export function ExerciseCard({ exercise, workoutId, index }: ExerciseCardProps) {
   const [open, setOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -32,6 +32,20 @@ export function ExerciseCard({ exercise, workoutId, index }: ExerciseCardProps) 
     if (open) document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [open]);
+
+  async function handleDelete() {
+    if (!confirm("Excluir este exercício?")) return;
+    setDeleting(true);
+    try {
+      const res = await fetch(
+        `/api/workouts/${workoutId}/exercises/${exercise.id}`,
+        { method: "DELETE" },
+      );
+      if (!res.ok) throw new Error("Erro ao excluir");
+    } catch {
+      alert("Erro ao excluir exercício.");
+    }
+  }
 
   return (
     <div className="flex items-center gap-3 py-3">
@@ -79,15 +93,11 @@ export function ExerciseCard({ exercise, workoutId, index }: ExerciseCardProps) 
               Editar
             </Link>
             <button
-              onClick={async () => {
-                setOpen(false);
-                if (confirm("Excluir este exercício?")) {
-                  await deleteExercise(exercise.id, workoutId);
-                }
-              }}
-              className="flex w-full items-center gap-2 px-3 py-2 text-[12px] text-[#E24B4A] transition-colors hover:bg-[#E24B4A]/10"
+              onClick={handleDelete}
+              disabled={deleting}
+              className="flex w-full items-center gap-2 px-3 py-2 text-[12px] text-[#E24B4A] transition-colors hover:bg-[#E24B4A]/10 disabled:opacity-50"
             >
-              Excluir
+              {deleting ? "Excluindo..." : "Excluir"}
             </button>
           </div>
         )}

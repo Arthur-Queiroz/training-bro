@@ -1,4 +1,5 @@
-import { getWorkout } from "@/lib/actions/workouts";
+import { auth } from "@clerk/nextjs/server";
+import { getWorkout } from "@/lib/services/workouts";
 import { getWorkoutPrimaryColor } from "@/lib/workout-colors";
 import { WorkoutSessionClient } from "./session-client";
 
@@ -7,8 +8,10 @@ export default async function WorkoutSessionPage({
 }: {
   params: Promise<{ workoutId: string }>;
 }) {
+  const { userId } = await auth();
+  if (!userId) throw new Error("Não autenticado");
   const { workoutId } = await params;
-  const workout = await getWorkout(workoutId);
+  const workout = await getWorkout(userId, workoutId);
   const color = getWorkoutPrimaryColor(workout.muscleGroups);
 
   return (

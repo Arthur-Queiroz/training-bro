@@ -1,9 +1,12 @@
 import Link from "next/link";
-import { getWorkouts } from "@/lib/actions/workouts";
+import { auth } from "@clerk/nextjs/server";
+import { listWorkouts } from "@/lib/services/workouts";
 import { WorkoutCard } from "@/components/workouts/workout-card";
 
 export default async function WorkoutsPage() {
-  const workouts = await getWorkouts();
+  const { userId } = await auth();
+  if (!userId) throw new Error("Não autenticado");
+  const workouts = await listWorkouts(userId);
 
   return (
     <div className="px-4 pt-4 pb-4 max-w-lg mx-auto lg:max-w-none lg:px-6 lg:pt-6">

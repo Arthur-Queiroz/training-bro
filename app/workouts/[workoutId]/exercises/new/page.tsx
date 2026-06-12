@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { createExercise } from "@/lib/actions/exercises";
 import { ExerciseForm } from "@/components/exercises/exercise-form";
 
 export default async function NewExercisePage({
@@ -18,7 +17,7 @@ export default async function NewExercisePage({
         &larr; Voltar
       </Link>
       <h1 className="mt-4 mb-6 text-2xl font-bold">Novo Exercício</h1>
-      <ExerciseForm action={createExercise} workoutId={workoutId} />
+      <ExerciseForm workoutId={workoutId} />
     </div>
   );
 }

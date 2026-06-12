@@ -1,9 +1,10 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { MUSCLE_GROUPS } from "@/lib/constants";
 
 interface WorkoutFormProps {
-  action: (formData: FormData) => Promise<void>;
   workout?: {
     id: string;
     name: string;
@@ -11,9 +12,48 @@ interface WorkoutFormProps {
   };
 }
 
-export function WorkoutForm({ action, workout }: WorkoutFormProps) {
+export function WorkoutForm({ workout }: WorkoutFormProps) {
+  const router = useRouter();
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setSaving(true);
+    setError(null);
+
+    const fd = new FormData(e.currentTarget);
+    const name = fd.get("name") as string;
+    const muscleGroups = fd.getAll("muscle_groups") as string[];
+
+    try {
+      const url = workout
+        ? `/api/workouts/${workout.id}`
+        : "/api/workouts";
+      const method = workout ? "PATCH" : "POST";
+
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, muscleGroups }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Erro ao salvar treino");
+      }
+
+      router.push(workout ? `/workouts/${workout.id}` : "/workouts");
+      router.refresh();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Erro ao salvar treino");
+    } finally {
+      setSaving(false);
+    }
+  }
+
   return (
-    <form action={action} className="space-y-5">
+    <form onSubmit={handleSubmit} className="space-y-5">
       {workout && <input type="hidden" name="id" value={workout.id} />}
 
       <div>
@@ -60,11 +100,16 @@ export function WorkoutForm({ action, workout }: WorkoutFormProps) {
         </div>
       </fieldset>
 
+      {error && (
+        <p className="text-[12px] text-[#E24B4A]">{error}</p>
+      )}
+
       <button
         type="submit"
-        className="w-full rounded-[8px] bg-[#E8612B] py-2.5 text-[13px] font-medium text-white transition-colors hover:bg-[#D4511F]"
+        disabled={saving}
+        className="w-full rounded-[8px] bg-[#E8612B] py-2.5 text-[13px] font-medium text-white transition-colors hover:bg-[#D4511F] disabled:opacity-50"
       >
-        {workout ? "Salvar Alterações" : "Criar Treino"}
+        {saving ? "Salvando..." : workout ? "Salvar Alterações" : "Criar Treino"}
       </button>
     </form>
   );

@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { getWorkout } from "@/lib/actions/workouts";
+import { auth } from "@clerk/nextjs/server";
+import { getWorkout } from "@/lib/services/workouts";
 import { ExerciseCard } from "@/components/exercises/exercise-card";
 import { getWorkoutPrimaryColor } from "@/lib/workout-colors";
 
@@ -8,8 +9,10 @@ export default async function WorkoutDetailPage({
 }: {
   params: Promise<{ workoutId: string }>;
 }) {
+  const { userId } = await auth();
+  if (!userId) throw new Error("Não autenticado");
   const { workoutId } = await params;
-  const workout = await getWorkout(workoutId);
+  const workout = await getWorkout(userId, workoutId);
   const color = getWorkoutPrimaryColor(workout.muscleGroups);
 
   return (
