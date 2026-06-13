@@ -22,7 +22,7 @@ export default async function WorkoutDetailPage({
       <div className="px-4 pt-4 pb-0 lg:px-6 lg:pt-6">
         <Link
           href="/workouts"
-          className="inline-flex items-center gap-1.5 text-[12px] text-[#5E5C55] hover:text-[#9B978E] transition-colors mb-3"
+          className="inline-flex items-center gap-1.5 text-[12px] text-ink-3 hover:text-ink-2 transition-colors mb-3"
         >
           <svg
             width="14"
@@ -40,7 +40,7 @@ export default async function WorkoutDetailPage({
         </Link>
 
         <div className="mb-4">
-          <h1 className="text-[16px] font-medium text-[#F0EDE6] mb-2">
+          <h1 className="text-[16px] font-medium text-ink mb-2">
             {workout.name}
           </h1>
           {workout.muscleGroups.length > 0 && (
@@ -66,18 +66,18 @@ export default async function WorkoutDetailPage({
       <div className="flex-1 px-4 lg:px-6">
         {workout.exercises.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-center">
-            <p className="text-[13px] text-[#5E5C55] mb-4">
+            <p className="text-[13px] text-ink-3 mb-4">
               Nenhum exercício ainda
             </p>
             <Link
               href={`/workouts/${workoutId}/exercises/new`}
-              className="rounded-[8px] bg-[#E8612B] px-4 py-2 text-[13px] font-medium text-white transition-colors hover:bg-[#D4511F]"
+              className="rounded-[8px] bg-accent px-4 py-2 text-[13px] font-medium text-on-accent transition-colors hover:bg-accent-2"
             >
               Adicionar exercício
             </Link>
           </div>
         ) : (
-          <div className="divide-y divide-white/[0.06]">
+          <div className="divide-y divide-line">
             {workout.exercises.map((exercise, index) => (
               <ExerciseCard
                 key={exercise.id}
@@ -91,17 +91,17 @@ export default async function WorkoutDetailPage({
       </div>
 
       {/* Bottom actions */}
-      <div className="sticky bottom-20 lg:bottom-0 px-4 pb-4 pt-3 lg:px-6 border-t border-white/[0.06] bg-[#0b0b0d] mt-4">
+      <div className="sticky bottom-20 lg:bottom-0 px-4 pb-4 pt-3 lg:px-6 border-t border-line bg-base mt-4">
         <div className="flex gap-2">
           <Link
             href={`/workouts/${workoutId}/edit`}
-            className="rounded-[8px] border border-white/[0.06] bg-[#141417] px-4 py-2.5 text-center text-[13px] font-medium text-[#F0EDE6] transition-colors hover:bg-[#1B1B1F]"
+            className="rounded-[8px] border border-line bg-surface px-4 py-2.5 text-center text-[13px] font-medium text-ink transition-colors hover:bg-surface-2"
           >
             Editar
           </Link>
           <Link
             href={`/workouts/${workoutId}/session`}
-            className="flex-1 rounded-[8px] bg-[#E8612B] py-2.5 text-center text-[13px] font-medium text-white transition-colors hover:bg-[#D4511F]"
+            className="flex-1 rounded-[8px] bg-accent py-2.5 text-center text-[13px] font-medium text-on-accent transition-colors hover:bg-accent-2"
           >
             Iniciar treino
           </Link>

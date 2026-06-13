@@ -20,7 +20,7 @@ export default function DadosPessoaisPage() {
   if (!isLoaded) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="h-5 w-5 rounded-full border-2 border-[#E8612B] border-t-transparent animate-spin" />
+        <div className="h-5 w-5 rounded-full border-2 border-accent border-t-transparent animate-spin" />
       </div>
     );
   }
@@ -63,13 +63,13 @@ export default function DadosPessoaisPage() {
       <div className="flex items-center gap-3 mb-6">
         <button
           onClick={() => router.back()}
-          className="flex items-center justify-center h-8 w-8 rounded-full text-[#9B978E] hover:text-[#F0EDE6] transition-colors"
+          className="flex items-center justify-center h-8 w-8 rounded-full text-ink-2 hover:text-ink transition-colors"
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="m15 18-6-6 6-6" />
           </svg>
         </button>
-        <h1 className="text-[16px] font-medium text-[#F0EDE6]">Dados pessoais</h1>
+        <h1 className="text-[16px] font-medium text-ink">Dados pessoais</h1>
       </div>
 
       {/* Avatar */}
@@ -79,7 +79,7 @@ export default function DadosPessoaisPage() {
           className="relative group"
           aria-label="Alterar foto de perfil"
         >
-          <div className="h-[72px] w-[72px] rounded-full overflow-hidden bg-[#E8612B] flex items-center justify-center text-[26px] font-medium text-white">
+          <div className="h-[72px] w-[72px] rounded-full overflow-hidden bg-accent flex items-center justify-center text-[26px] font-medium text-on-accent">
             {avatarSrc ? (
               <Image
                 src={avatarSrc}
@@ -101,7 +101,7 @@ export default function DadosPessoaisPage() {
         </button>
         <button
           onClick={() => fileInputRef.current?.click()}
-          className="mt-2 text-[12px] text-[#E8612B] hover:text-[#d45422] transition-colors"
+          className="mt-2 text-[12px] text-accent hover:text-accent-2 transition-colors"
         >
           Alterar foto
         </button>
@@ -115,43 +115,43 @@ export default function DadosPessoaisPage() {
       </div>
 
       {/* Form */}
-      <div className="rounded-[10px] border border-white/[0.06] bg-[#141417] divide-y divide-white/[0.06] mb-4">
+      <div className="rounded-[10px] border border-line bg-surface divide-y divide-line mb-4">
         <div className="px-4 py-3">
-          <label className="block text-[11px] text-[#5E5C55] mb-1">Nome</label>
+          <label className="block text-[11px] text-ink-3 mb-1">Nome</label>
           <input
             type="text"
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
             placeholder="Seu nome"
-            className="w-full bg-transparent text-[13px] text-[#F0EDE6] placeholder-[#5E5C55] outline-none"
+            className="w-full bg-transparent text-[13px] text-ink placeholder-ink-3 outline-none"
           />
         </div>
         <div className="px-4 py-3">
-          <label className="block text-[11px] text-[#5E5C55] mb-1">Sobrenome</label>
+          <label className="block text-[11px] text-ink-3 mb-1">Sobrenome</label>
           <input
             type="text"
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
             placeholder="Seu sobrenome"
-            className="w-full bg-transparent text-[13px] text-[#F0EDE6] placeholder-[#5E5C55] outline-none"
+            className="w-full bg-transparent text-[13px] text-ink placeholder-ink-3 outline-none"
           />
         </div>
         <div className="px-4 py-3">
-          <label className="block text-[11px] text-[#5E5C55] mb-1">Email</label>
-          <p className="text-[13px] text-[#5E5C55]">
+          <label className="block text-[11px] text-ink-3 mb-1">Email</label>
+          <p className="text-[13px] text-ink-3">
             {user?.primaryEmailAddress?.emailAddress ?? "—"}
           </p>
         </div>
       </div>
 
       {error && (
-        <p className="text-[12px] text-[#E24B4A] mb-4">{error}</p>
+        <p className="text-[12px] text-danger mb-4">{error}</p>
       )}
 
       <button
         onClick={handleSave}
         disabled={saving || !hasChanges}
-        className="w-full rounded-[8px] bg-[#E8612B] py-2.5 text-[13px] font-medium text-white transition-opacity disabled:opacity-40"
+        className="w-full rounded-[8px] bg-accent py-2.5 text-[13px] font-medium text-on-accent transition-opacity disabled:opacity-40"
       >
         {saving ? "Salvando..." : "Salvar alterações"}
       </button>

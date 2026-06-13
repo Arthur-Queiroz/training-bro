@@ -1,15 +1,166 @@
 @import "tailwindcss";
 
+/* ════════════════════════════════════════════════════════════════════════
+   SISTEMA DE TEMAS — design tokens
+
+   Como funciona:
+   1. Cada tema define o mesmo conjunto de variáveis CSS (--base, --ink, ...).
+   2. O tema ativo é escolhido pelo atributo data-theme no <html>
+      (aplicado por um script inline no layout antes da primeira pintura,
+      pra não dar "flash" do tema errado).
+   3. O bloco @theme inline mapeia as variáveis para cores do Tailwind,
+      gerando utilitários como bg-surface, text-ink, border-line.
+      Modificadores de opacidade (ex: bg-accent/10) funcionam normalmente.
+
+   Para criar um tema novo: copie um bloco [data-theme="..."], troque os
+   valores, e registre o tema em lib/themes.ts (picker + cor da status bar).
+
+   Papel de cada token:
+   --base       fundo do app (atrás de tudo)
+   --surface    cartões, inputs, blocos
+   --surface-2  hover/elevação de cartões, inputs em foco
+   --ink        texto principal
+   --ink-2      texto secundário (subtítulos, labels)
+   --ink-3      texto apagado (hints, timestamps, placeholders)
+   --line       bordas e divisórias sutis
+   --line-2     bordas mais visíveis (ex: contorno de checkbox)
+   --accent     cor da marca (botões primários, item de nav ativo)
+   --accent-2   hover do accent
+   --on-accent  texto/ícone EM CIMA do accent (não é sempre branco:
+                em temas de accent claro, como catppuccin, é escuro)
+   --ok         sucesso (treino concluído, streak)
+   --danger     erro / ações destrutivas
+   ════════════════════════════════════════════════════════════════════════ */
+
 @theme inline {
   --font-sans: var(--font-dm-sans);
   --font-display: var(--font-instrument-serif);
   --font-body: var(--font-dm-sans);
+
+  --color-base: var(--base);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-line: var(--line);
+  --color-line-2: var(--line-2);
+  --color-accent: var(--accent);
+  --color-accent-2: var(--accent-2);
+  --color-on-accent: var(--on-accent);
+  --color-ok: var(--ok);
+  --color-danger: var(--danger);
+}
+
+/* ── Escuro (padrão) — o visual original do app ─────────────────────────
+   Sem data-theme (primeira visita, localStorage vazio) cai aqui. */
+:root {
+  --base: #0b0b0d;
+  --surface: #141417;
+  --surface-2: #1b1b1f;
+  --ink: #f0ede6;
+  --ink-2: #9b978e;
+  --ink-3: #5e5c55;
+  --line: rgba(255, 255, 255, 0.06);
+  --line-2: #3a3a3f;
+  --accent: #e8612b;
+  --accent-2: #d4511f;
+  --on-accent: #ffffff;
+  --ok: #2ebd6b;
+  --danger: #e24b4a;
+  /* color-scheme controla scrollbar, inputs nativos e o teclado do mobile */
+  color-scheme: dark;
+}
+
+/* ── Claro — papel quente, mantém o laranja da marca (escurecido p/
+   contraste AA sobre branco) ──────────────────────────────────────────── */
+[data-theme="light"] {
+  --base: #f6f4ef;
+  --surface: #ffffff;
+  --surface-2: #edeae2;
+  --ink: #201e1a;
+  --ink-2: #615d52;
+  --ink-3: #94907f;
+  --line: rgba(20, 18, 14, 0.08);
+  --line-2: #c9c4b8;
+  --accent: #d14e1d;
+  --accent-2: #b5421a;
+  --on-accent: #ffffff;
+  --ok: #1e9e58;
+  --danger: #ce3b3a;
+  color-scheme: light;
+}
+
+/* ── Catppuccin (Mocha) — paleta oficial: github.com/catppuccin/catppuccin
+   Accent = peach; como o peach é claro, o on-accent é o próprio base. ── */
+[data-theme="catppuccin"] {
+  --base: #1e1e2e;
+  --surface: #313244;   /* surface0 */
+  --surface-2: #45475a; /* surface1 */
+  --ink: #cdd6f4;       /* text */
+  --ink-2: #a6adc8;     /* subtext0 */
+  --ink-3: #7f849c;     /* overlay1 */
+  --line: rgba(205, 214, 244, 0.08);
+  --line-2: #585b70;    /* surface2 */
+  --accent: #fab387;    /* peach */
+  --accent-2: #f0975e;
+  --on-accent: #1e1e2e;
+  --ok: #a6e3a1;        /* green */
+  --danger: #f38ba8;    /* red */
+  color-scheme: dark;
+}
+
+/* ── Nord — paleta oficial: nordtheme.com. Accent = frost (nord8);
+   claro também, então on-accent escuro. ──────────────────────────────── */
+[data-theme="nord"] {
+  --base: #2e3440;
+  --surface: #3b4252;
+  --surface-2: #434c5e;
+  --ink: #eceff4;
+  --ink-2: #a9b3c4;
+  --ink-3: #6f7c93;
+  --line: rgba(236, 239, 244, 0.07);
+  --line-2: #4c566a;
+  --accent: #88c0d0;
+  --accent-2: #79b0c2;
+  --on-accent: #2e3440;
+  --ok: #a3be8c;
+  --danger: #bf616a;
+  color-scheme: dark;
+}
+
+/* ── AMOLED — preto absoluto: em telas OLED os pixels do fundo desligam,
+   economizando bateria (relevante: PWA usado na academia, longe da tomada).
+   Accent um tom mais vivo pra compensar o contraste do preto puro. ───── */
+[data-theme="amoled"] {
+  --base: #000000;
+  --surface: #0e0e10;
+  --surface-2: #1a1a1d;
+  --ink: #f5f5f5;
+  --ink-2: #9b9ba2;
+  --ink-3: #5b5b62;
+  --line: rgba(255, 255, 255, 0.09);
+  --line-2: #3d3d44;
+  --accent: #ff6b35;
+  --accent-2: #e8612b;
+  --on-accent: #ffffff;
+  --ok: #30d158;
+  --danger: #ff5d5c;
+  color-scheme: dark;
 }
 
 html,
 body {
-  background-color: #0b0b0d;
-  color: #f0ede6;
+  background-color: var(--base);
+  color: var(--ink);
   font-family: var(--font-dm-sans), -apple-system, BlinkMacSystemFont, sans-serif;
-  color-scheme: dark;
+}
+
+/* Trocar de tema não deve "piscar": transiciona as cores de fundo/texto.
+   A classe é adicionada pelo picker só durante a troca — transição
+   permanente em listas grandes fica pesada no mobile. */
+html.theme-transition,
+html.theme-transition * {
+  transition: background-color 0.18s ease, border-color 0.18s ease,
+    color 0.18s ease;
 }

@@ -37,9 +37,9 @@ export default async function HistoryPage() {
   return (
     <div className="px-4 pt-4 pb-4 max-w-lg mx-auto lg:max-w-none lg:px-6 lg:pt-6">
       <div className="flex items-center justify-between mb-4">
-        <h1 className="text-[16px] font-medium text-[#F0EDE6]">Histórico</h1>
+        <h1 className="text-[16px] font-medium text-ink">Histórico</h1>
         {sessions.length > 0 && (
-          <span className="text-[11px] text-[#5E5C55]">
+          <span className="text-[11px] text-ink-3">
             {sessions.length} treino{sessions.length !== 1 ? "s" : ""} realizados
           </span>
         )}
@@ -47,10 +47,10 @@ export default async function HistoryPage() {
 
       {sessions.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 text-center">
-          <p className="text-[13px] text-[#5E5C55]">
+          <p className="text-[13px] text-ink-3">
             Nenhum treino registrado ainda
           </p>
-          <p className="text-[11px] text-[#5E5C55] mt-1">
+          <p className="text-[11px] text-ink-3 mt-1">
             Conclua um treino para ele aparecer aqui
           </p>
         </div>
@@ -58,10 +58,10 @@ export default async function HistoryPage() {
         <div className="space-y-5">
           {Object.entries(grouped).map(([month, monthSessions]) => (
             <div key={month}>
-              <p className="text-[11px] font-medium uppercase tracking-[0.5px] text-[#5E5C55] mb-2">
+              <p className="text-[11px] font-medium uppercase tracking-[0.5px] text-ink-3 mb-2">
                 {month}
               </p>
-              <div className="rounded-[10px] bg-[#141417] border border-white/[0.06] divide-y divide-white/[0.06]">
+              <div className="rounded-[10px] bg-surface border border-line divide-y divide-line">
                 {monthSessions.map((session) => {
                   const color = getWorkoutPrimaryColor(session.workout.muscleGroups);
                   const { date, time } = formatDate(session.performedAt);
@@ -72,7 +72,7 @@ export default async function HistoryPage() {
                         style={{ backgroundColor: color.solid }}
                       />
                       <div className="min-w-0 flex-1">
-                        <p className="text-[13px] font-medium text-[#F0EDE6] truncate">
+                        <p className="text-[13px] font-medium text-ink truncate">
                           {session.workout.name}
                         </p>
                         {session.workout.muscleGroups.length > 0 && (
@@ -93,8 +93,8 @@ export default async function HistoryPage() {
                         )}
                       </div>
                       <div className="text-right flex-shrink-0">
-                        <p className="text-[12px] text-[#9B978E]">{date}</p>
-                        <p className="text-[11px] text-[#5E5C55]">{time}</p>
+                        <p className="text-[12px] text-ink-2">{date}</p>
+                        <p className="text-[11px] text-ink-3">{time}</p>
                       </div>
                     </div>
                   );

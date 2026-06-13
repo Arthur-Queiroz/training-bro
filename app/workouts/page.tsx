@@ -12,12 +12,12 @@ export default async function WorkoutsPage() {
     <div className="px-4 pt-4 pb-4 max-w-lg mx-auto lg:max-w-none lg:px-6 lg:pt-6">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <h1 className="text-[16px] font-medium text-[#F0EDE6]">
+        <h1 className="text-[16px] font-medium text-ink">
           Meus treinos
         </h1>
         <Link
           href="/workouts/new"
-          className="flex h-7 w-7 items-center justify-center rounded-[7px] border border-white/[0.06] bg-[#141417] text-[#9B978E] transition-colors hover:text-[#F0EDE6]"
+          className="flex h-7 w-7 items-center justify-center rounded-[7px] border border-line bg-surface text-ink-2 transition-colors hover:text-ink"
         >
           <svg
             width="14"
@@ -37,12 +37,12 @@ export default async function WorkoutsPage() {
 
       {workouts.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 text-center">
-          <p className="text-[13px] text-[#5E5C55] mb-4">
+          <p className="text-[13px] text-ink-3 mb-4">
             Nenhum treino cadastrado ainda
           </p>
           <Link
             href="/workouts/new"
-            className="rounded-[8px] bg-[#E8612B] px-4 py-2 text-[13px] font-medium text-white transition-colors hover:bg-[#D4511F]"
+            className="rounded-[8px] bg-accent px-4 py-2 text-[13px] font-medium text-on-accent transition-colors hover:bg-accent-2"
           >
             Criar primeiro treino
           </Link>

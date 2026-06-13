@@ -59,12 +59,12 @@ export function ExerciseForm({ workoutId, exercise }: ExerciseFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-5">
       <input type="hidden" name="workout_id" value={workoutId} />
       {exercise && <input type="hidden" name="id" value={exercise.id} />}
 
       <div>
-        <label htmlFor="name" className="block text-sm font-medium mb-1">
+        <label htmlFor="name" className="block text-[12px] font-medium text-ink-2 mb-1.5">
           Nome do Exercício
         </label>
         <input
@@ -74,13 +74,13 @@ export function ExerciseForm({ workoutId, exercise }: ExerciseFormProps) {
           defaultValue={exercise?.name ?? ""}
           placeholder="Ex: Supino Reto, Agachamento..."
           required
-          className="w-full rounded-lg border border-zinc-300 bg-transparent px-3 py-2 text-sm outline-none focus:border-zinc-500 dark:border-zinc-600 dark:focus:border-zinc-400"
+          className="w-full rounded-[8px] border border-line bg-surface px-3 py-2.5 text-[13px] text-ink placeholder-ink-3 outline-none transition-colors focus:border-accent/50 focus:bg-surface-2"
         />
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label htmlFor="sets" className="block text-sm font-medium mb-1">
+          <label htmlFor="sets" className="block text-[12px] font-medium text-ink-2 mb-1.5">
             Séries
           </label>
           <input
@@ -90,11 +90,11 @@ export function ExerciseForm({ workoutId, exercise }: ExerciseFormProps) {
             min={1}
             defaultValue={exercise?.sets ?? 3}
             required
-            className="w-full rounded-lg border border-zinc-300 bg-transparent px-3 py-2 text-sm outline-none focus:border-zinc-500 dark:border-zinc-600 dark:focus:border-zinc-400"
+            className="w-full rounded-[8px] border border-line bg-surface px-3 py-2.5 text-[13px] text-ink placeholder-ink-3 outline-none transition-colors focus:border-accent/50 focus:bg-surface-2"
           />
         </div>
         <div>
-          <label htmlFor="reps" className="block text-sm font-medium mb-1">
+          <label htmlFor="reps" className="block text-[12px] font-medium text-ink-2 mb-1.5">
             Repetições
           </label>
           <input
@@ -104,14 +104,14 @@ export function ExerciseForm({ workoutId, exercise }: ExerciseFormProps) {
             min={1}
             defaultValue={exercise?.reps ?? 12}
             required
-            className="w-full rounded-lg border border-zinc-300 bg-transparent px-3 py-2 text-sm outline-none focus:border-zinc-500 dark:border-zinc-600 dark:focus:border-zinc-400"
+            className="w-full rounded-[8px] border border-line bg-surface px-3 py-2.5 text-[13px] text-ink placeholder-ink-3 outline-none transition-colors focus:border-accent/50 focus:bg-surface-2"
           />
         </div>
       </div>
 
       <div>
-        <label htmlFor="video_url" className="block text-sm font-medium mb-1">
-          Link de Vídeo <span className="text-zinc-400">(opcional)</span>
+        <label htmlFor="video_url" className="block text-[12px] font-medium text-ink-2 mb-1.5">
+          Link de Vídeo <span className="text-ink-3">(opcional)</span>
         </label>
         <input
           type="text"
@@ -120,16 +120,16 @@ export function ExerciseForm({ workoutId, exercise }: ExerciseFormProps) {
           name="video_url"
           defaultValue={exercise?.videoUrl ?? ""}
           placeholder="youtube.com/..."
-          className="w-full rounded-lg border border-zinc-300 bg-transparent px-3 py-2 text-sm outline-none focus:border-zinc-500 dark:border-zinc-600 dark:focus:border-zinc-400"
+          className="w-full rounded-[8px] border border-line bg-surface px-3 py-2.5 text-[13px] text-ink placeholder-ink-3 outline-none transition-colors focus:border-accent/50 focus:bg-surface-2"
         />
       </div>
 
       <div>
         <label
           htmlFor="instruction_url"
-          className="block text-sm font-medium mb-1"
+          className="block text-[12px] font-medium text-ink-2 mb-1.5"
         >
-          Link de Instruções <span className="text-zinc-400">(opcional)</span>
+          Link de Instruções <span className="text-ink-3">(opcional)</span>
         </label>
         <input
           type="text"
@@ -138,18 +138,18 @@ export function ExerciseForm({ workoutId, exercise }: ExerciseFormProps) {
           name="instruction_url"
           defaultValue={exercise?.instructionUrl ?? ""}
           placeholder="exemplo.com/..."
-          className="w-full rounded-lg border border-zinc-300 bg-transparent px-3 py-2 text-sm outline-none focus:border-zinc-500 dark:border-zinc-600 dark:focus:border-zinc-400"
+          className="w-full rounded-[8px] border border-line bg-surface px-3 py-2.5 text-[13px] text-ink placeholder-ink-3 outline-none transition-colors focus:border-accent/50 focus:bg-surface-2"
         />
       </div>
 
       {error && (
-        <p className="text-[12px] text-[#E24B4A]">{error}</p>
+        <p className="text-[12px] text-danger">{error}</p>
       )}
 
       <button
         type="submit"
         disabled={saving}
-        className="w-full rounded-lg bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300 disabled:opacity-50"
+        className="w-full rounded-[8px] bg-accent py-2.5 text-[13px] font-medium text-on-accent transition-colors hover:bg-accent-2 disabled:opacity-50"
       >
         {saving ? "Salvando..." : exercise ? "Salvar Alterações" : "Adicionar Exercício"}
       </button>
