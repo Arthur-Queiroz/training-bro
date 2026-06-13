@@ -19,6 +19,7 @@ import {
   listSessions,
   getSessionsThisWeek,
   getStreak,
+  getSessionStats,
 } from "@/lib/services/sessions";
 
 const mockedWorkout = vi.mocked(prisma.workout);
@@ -165,5 +166,52 @@ describe("getStreak", () => {
   it("sem treino nesta semana E na passada → 0 (graça é de só 1 semana)", async () => {
     sessionsOn(new Date(2026, 4, 27)); // só -2
     expect(await getStreak("user_1")).toBe(0);
+  });
+});
+
+describe("getSessionStats", () => {
+  const session = (performedAt: Date, muscleGroups: string[]) =>
+    ({ performedAt, workout: { muscleGroups } }) as never;
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 5, 10, 12, 0)); // junho
+  });
+
+  it("filtra pelo clerkUserId do usuário", async () => {
+    mockedSession.findMany.mockResolvedValue([]);
+    await getSessionStats("user_1");
+    expect(mockedSession.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { clerkUserId: "user_1" } }),
+    );
+  });
+
+  it("sem sessões → zeros e lista vazia", async () => {
+    mockedSession.findMany.mockResolvedValue([]);
+    expect(await getSessionStats("user_1")).toEqual({
+      total: 0,
+      thisMonth: 0,
+      muscleGroups: [],
+    });
+  });
+
+  it("conta total, mês corrente e agrega grupos ordenados desc", async () => {
+    mockedSession.findMany.mockResolvedValue([
+      session(new Date(2026, 5, 5), ["Peito", "Tríceps"]), // junho
+      session(new Date(2026, 5, 8), ["Peito"]), // junho
+      session(new Date(2026, 4, 20), ["Costas"]), // maio (fora do mês)
+    ]);
+
+    const stats = await getSessionStats("user_1");
+
+    expect(stats.total).toBe(3);
+    expect(stats.thisMonth).toBe(2);
+    expect(stats.muscleGroups[0]).toEqual({ group: "Peito", count: 2 });
+    // Peito (2) na frente; Tríceps e Costas empatados em 1.
+    expect(stats.muscleGroups.map((m) => m.group)).toEqual([
+      "Peito",
+      "Tríceps",
+      "Costas",
+    ]);
   });
 });
