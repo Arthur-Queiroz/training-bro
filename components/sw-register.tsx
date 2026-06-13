@@ -50,20 +50,20 @@ export function SWRegister() {
   if (!showBanner) return null;
 
   return (
-    <div className="fixed bottom-4 left-4 right-4 z-50 flex items-center justify-between gap-3 rounded-lg border border-zinc-700 bg-zinc-900 p-4 shadow-lg">
-      <p className="text-sm text-zinc-200">
+    <div className="fixed bottom-4 left-4 right-4 z-50 flex items-center justify-between gap-3 rounded-lg border border-line bg-surface-2 p-4 shadow-lg">
+      <p className="text-sm text-ink">
         Instale o <strong>Training Bro</strong> no seu dispositivo!
       </p>
       <div className="flex shrink-0 gap-2">
         <button
           onClick={() => setShowBanner(false)}
-          className="rounded-md px-3 py-1.5 text-sm text-zinc-400 transition-colors hover:text-zinc-200"
+          className="rounded-md px-3 py-1.5 text-sm text-ink-2 transition-colors hover:text-ink"
         >
           Agora não
         </button>
         <button
           onClick={handleInstall}
-          className="rounded-md bg-white px-3 py-1.5 text-sm font-medium text-zinc-900 transition-colors hover:bg-zinc-200"
+          className="rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-on-accent transition-colors hover:bg-accent-2"
         >
           Instalar
         </button>

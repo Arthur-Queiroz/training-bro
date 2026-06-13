@@ -17,7 +17,7 @@ export function WorkoutCard({ workout }: WorkoutCardProps) {
   return (
     <Link
       href={`/workouts/${workout.id}`}
-      className="flex items-start gap-3 rounded-[10px] border border-white/[0.06] bg-[#141417] p-3 transition-colors hover:bg-[#1B1B1F]"
+      className="flex items-start gap-3 rounded-[10px] border border-line bg-surface p-3 transition-colors hover:bg-surface-2"
     >
       {/* Color dot */}
       <span
@@ -27,7 +27,7 @@ export function WorkoutCard({ workout }: WorkoutCardProps) {
 
       {/* Content */}
       <div className="min-w-0 flex-1">
-        <p className="text-[13px] font-medium text-[#F0EDE6] leading-tight">
+        <p className="text-[13px] font-medium text-ink leading-tight">
           {workout.name}
         </p>
 
@@ -48,7 +48,7 @@ export function WorkoutCard({ workout }: WorkoutCardProps) {
           </div>
         )}
 
-        <p className="mt-1.5 text-[11px] text-[#5E5C55]">
+        <p className="mt-1.5 text-[11px] text-ink-3">
           {exerciseCount === 0
             ? "Nenhum exercício"
             : `${exerciseCount} exercício${exerciseCount > 1 ? "s" : ""}`}

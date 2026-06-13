@@ -26,7 +26,7 @@ export function DeleteWorkoutButton({ workoutId }: { workoutId: string }) {
     <button
       onClick={handleDelete}
       disabled={deleting}
-      className="w-full rounded-[8px] border border-red-500/30 bg-red-500/10 py-2.5 text-[13px] font-medium text-red-400 transition-colors hover:bg-red-500/20 disabled:opacity-50"
+      className="w-full rounded-[8px] border border-danger/30 bg-danger/10 py-2.5 text-[13px] font-medium text-danger transition-colors hover:bg-danger/20 disabled:opacity-50"
     >
       {deleting ? "Excluindo..." : "Excluir treino"}
     </button>

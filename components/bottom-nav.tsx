@@ -29,7 +29,7 @@ export function BottomNav() {
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/[0.06] bg-[#0b0b0d] lg:hidden">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-line bg-base lg:hidden">
       <div className="flex items-center justify-around px-2 pt-2 pb-6">
         {TABS.map(({ href, label, icon: Icon, special }) => {
           const active = isActive(href);
@@ -38,11 +38,11 @@ export function BottomNav() {
               key={href}
               href={href}
               className={`flex flex-col items-center gap-1 px-3 py-1 transition-colors ${
-                active ? "text-[#E8612B]" : "text-[#5E5C55]"
+                active ? "text-accent" : "text-ink-3"
               }`}
             >
               {special ? (
-                <div className="flex h-8 w-8 items-center justify-center rounded-[8px] border border-white/[0.06] bg-[#141417]">
+                <div className="flex h-8 w-8 items-center justify-center rounded-[8px] border border-line bg-surface">
                   <Icon />
                 </div>
               ) : (

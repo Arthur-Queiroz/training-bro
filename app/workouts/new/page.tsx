@@ -6,7 +6,7 @@ export default function NewWorkoutPage() {
     <div className="px-4 pt-4 pb-4 max-w-lg mx-auto lg:max-w-none lg:px-6 lg:pt-6">
       <Link
         href="/workouts"
-        className="inline-flex items-center gap-1.5 text-[12px] text-[#5E5C55] hover:text-[#9B978E] transition-colors mb-4"
+        className="inline-flex items-center gap-1.5 text-[12px] text-ink-3 hover:text-ink-2 transition-colors mb-4"
       >
         <svg
           width="14"
@@ -22,7 +22,7 @@ export default function NewWorkoutPage() {
         </svg>
         Voltar
       </Link>
-      <h1 className="text-[16px] font-medium text-[#F0EDE6] mb-5">
+      <h1 className="text-[16px] font-medium text-ink mb-5">
         Novo Treino
       </h1>
       <WorkoutForm />

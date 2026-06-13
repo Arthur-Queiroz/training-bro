@@ -25,14 +25,14 @@ const NAV_SECTIONS = [
   },
   {
     label: "PROGRESSO",
-    items: [
-      { href: "/history", label: "Histórico", icon: HistoryIcon },
-      { href: "/measurements", label: "Medidas", icon: MeasurementsIcon },
-    ],
+    // "/measurements" era link morto (rota não existe) — removido até a
+    // feature de medidas existir.
+    items: [{ href: "/history", label: "Histórico", icon: HistoryIcon }],
   },
   {
     label: "CONTA",
-    items: [{ href: "/settings", label: "Config", icon: SettingsIcon }],
+    // "/settings" não existia; o hub real de conta é o perfil.
+    items: [{ href: "/profile", label: "Perfil", icon: SettingsIcon }],
   },
 ];
 
@@ -53,17 +53,17 @@ export function Sidebar({ userInfo }: SidebarProps) {
   };
 
   return (
-    <aside className="hidden lg:flex w-[200px] flex-shrink-0 flex-col border-r border-white/[0.06] bg-[#0b0b0d] h-screen sticky top-0">
+    <aside className="hidden lg:flex w-[200px] flex-shrink-0 flex-col border-r border-line bg-base h-screen sticky top-0">
       {/* Logo */}
       <div className="px-4 pt-5 pb-6">
         <Link href="/" className="flex items-center gap-2">
-          <div className="flex h-7 w-7 items-center justify-center rounded-[7px] bg-[#E8612B]">
+          <div className="flex h-7 w-7 items-center justify-center rounded-[7px] bg-accent">
             <svg
               width="15"
               height="15"
               viewBox="0 0 24 24"
               fill="none"
-              stroke="white"
+              stroke="var(--on-accent)"
               strokeWidth="2.5"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -74,7 +74,7 @@ export function Sidebar({ userInfo }: SidebarProps) {
             </svg>
           </div>
           <span
-            className="text-[16px] text-[#F0EDE6]"
+            className="text-[16px] text-ink"
             style={{ fontFamily: "var(--font-instrument-serif)" }}
           >
             Training Bro
@@ -86,7 +86,7 @@ export function Sidebar({ userInfo }: SidebarProps) {
       <nav className="flex-1 overflow-y-auto px-2">
         {NAV_SECTIONS.map((section) => (
           <div key={section.label} className="mb-4">
-            <p className="px-3 pb-1.5 pt-3 text-[11px] font-medium uppercase tracking-[1px] text-[#5E5C55]">
+            <p className="px-3 pb-1.5 pt-3 text-[11px] font-medium uppercase tracking-[1px] text-ink-3">
               {section.label}
             </p>
             {section.items.map(({ href, label, icon: Icon }) => {
@@ -97,8 +97,8 @@ export function Sidebar({ userInfo }: SidebarProps) {
                   href={href}
                   className={`mx-2 my-0.5 flex items-center gap-2.5 rounded-[7px] px-3 py-2 text-[12px] transition-colors ${
                     active
-                      ? "bg-[#E8612B]/10 text-[#E8612B]"
-                      : "text-[#9B978E] hover:bg-white/[0.04] hover:text-[#F0EDE6]"
+                      ? "bg-accent/10 text-accent"
+                      : "text-ink-2 hover:bg-surface hover:text-ink"
                   }`}
                 >
                   <Icon active={active} />
@@ -112,9 +112,9 @@ export function Sidebar({ userInfo }: SidebarProps) {
 
       {/* User profile */}
       {userInfo && (
-        <div className="border-t border-white/[0.06] p-3">
-          <div className="flex items-center gap-2.5 rounded-[8px] bg-[#141417] p-2">
-            <div className="flex h-[30px] w-[30px] flex-shrink-0 items-center justify-center rounded-full bg-[#E8612B] text-[12px] font-medium text-white overflow-hidden">
+        <div className="border-t border-line p-3">
+          <div className="flex items-center gap-2.5 rounded-[8px] bg-surface p-2">
+            <div className="flex h-[30px] w-[30px] flex-shrink-0 items-center justify-center rounded-full bg-accent text-[12px] font-medium text-on-accent overflow-hidden">
               {userInfo.imageUrl ? (
                 <Image src={userInfo.imageUrl} alt="Perfil" width={30} height={30} className="object-cover w-full h-full" />
               ) : (
@@ -122,16 +122,16 @@ export function Sidebar({ userInfo }: SidebarProps) {
               )}
             </div>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-[12px] font-medium text-[#F0EDE6]">
+              <p className="truncate text-[12px] font-medium text-ink">
                 {userInfo.firstName}
               </p>
-              <p className="truncate text-[11px] text-[#5E5C55]">
+              <p className="truncate text-[11px] text-ink-3">
                 {userInfo.plan}
               </p>
             </div>
             <SignOutButton>
               <button
-                className="flex-shrink-0 text-[#5E5C55] hover:text-[#9B978E] transition-colors"
+                className="flex-shrink-0 text-ink-3 hover:text-ink-2 transition-colors"
                 title="Sair"
               >
                 <SignOutIcon />
@@ -153,7 +153,7 @@ function DashboardIcon({ active }: { active?: boolean }) {
       height="16"
       viewBox="0 0 24 24"
       fill="none"
-      stroke={active ? "#E8612B" : "currentColor"}
+      stroke={active ? "var(--accent)" : "currentColor"}
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -173,7 +173,7 @@ function WorkoutsIcon({ active }: { active?: boolean }) {
       height="16"
       viewBox="0 0 24 24"
       fill="none"
-      stroke={active ? "#E8612B" : "currentColor"}
+      stroke={active ? "var(--accent)" : "currentColor"}
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -192,7 +192,7 @@ function PlusIcon({ active }: { active?: boolean }) {
       height="16"
       viewBox="0 0 24 24"
       fill="none"
-      stroke={active ? "#E8612B" : "currentColor"}
+      stroke={active ? "var(--accent)" : "currentColor"}
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -210,7 +210,7 @@ function HistoryIcon({ active }: { active?: boolean }) {
       height="16"
       viewBox="0 0 24 24"
       fill="none"
-      stroke={active ? "#E8612B" : "currentColor"}
+      stroke={active ? "var(--accent)" : "currentColor"}
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -221,23 +221,6 @@ function HistoryIcon({ active }: { active?: boolean }) {
   );
 }
 
-function MeasurementsIcon({ active }: { active?: boolean }) {
-  return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke={active ? "#E8612B" : "currentColor"}
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M3 3v18h18" />
-      <path d="m19 9-5 5-4-4-3 3" />
-    </svg>
-  );
-}
 
 function SettingsIcon({ active }: { active?: boolean }) {
   return (
@@ -246,7 +229,7 @@ function SettingsIcon({ active }: { active?: boolean }) {
       height="16"
       viewBox="0 0 24 24"
       fill="none"
-      stroke={active ? "#E8612B" : "currentColor"}
+      stroke={active ? "var(--accent)" : "currentColor"}
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"

@@ -1,17 +1,11 @@
 import Link from "next/link";
-import { ExerciseForm } from "@/components/exercises/exercise-form";
+import { ThemePicker } from "@/components/theme-picker";
 
-export default async function NewExercisePage({
-  params,
-}: {
-  params: Promise<{ workoutId: string }>;
-}) {
-  const { workoutId } = await params;
-
+export default function AparenciaPage() {
   return (
     <div className="px-4 pt-4 pb-4 max-w-lg mx-auto lg:max-w-none lg:px-6 lg:pt-6">
       <Link
-        href={`/workouts/${workoutId}`}
+        href="/profile"
         className="inline-flex items-center gap-1.5 text-[12px] text-ink-3 hover:text-ink-2 transition-colors mb-4"
       >
         <svg
@@ -28,8 +22,13 @@ export default async function NewExercisePage({
         </svg>
         Voltar
       </Link>
-      <h1 className="text-[16px] font-medium text-ink mb-5">Novo exercício</h1>
-      <ExerciseForm workoutId={workoutId} />
+
+      <h1 className="text-[16px] font-medium text-ink mb-1">Aparência</h1>
+      <p className="text-[12px] text-ink-3 mb-5">
+        Escolha o tema do app. A preferência fica salva neste dispositivo.
+      </p>
+
+      <ThemePicker />
     </div>
   );
 }
