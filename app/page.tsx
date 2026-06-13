@@ -4,6 +4,7 @@ import { currentUser } from "@clerk/nextjs/server";
 import { listWorkouts } from "@/lib/services/workouts";
 import { getSessionsThisWeek } from "@/lib/services/sessions";
 import { getWorkoutPrimaryColor } from "@/lib/workout-colors";
+import { mondayFirstIndex, startOfWeek } from "@/lib/week";
 
 const DAY_LABELS = ["S", "T", "Q", "Q", "S", "S", "D"];
 
@@ -23,14 +24,12 @@ export default async function Home() {
   ]);
 
   const now = new Date();
-  const dow = now.getDay();
-  const todayIndex = dow === 0 ? 6 : dow - 1;
-  const dayLabel = DAYS_PT[dow];
+  const todayIndex = mondayFirstIndex(now);
+  const dayLabel = DAYS_PT[now.getDay()];
   const monthLabel = MONTHS_PT[now.getMonth()];
   const dayNum = now.getDate();
 
-  const weekStart = new Date(now);
-  weekStart.setDate(now.getDate() - todayIndex);
+  const weekStart = startOfWeek(now);
   const weekDates = Array.from({ length: 7 }, (_, i) => {
     const d = new Date(weekStart);
     d.setDate(weekStart.getDate() + i);
@@ -38,10 +37,7 @@ export default async function Home() {
   });
 
   const sessionDays = new Set(
-    sessionsThisWeek.map((s) => {
-      const d = new Date(s.performedAt);
-      return d.getDay() === 0 ? 6 : d.getDay() - 1;
-    })
+    sessionsThisWeek.map((s) => mondayFirstIndex(new Date(s.performedAt))),
   );
 
   return (

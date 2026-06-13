@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { NotFoundError } from "@/lib/errors";
+import { startOfWeek } from "@/lib/week";
 
 export async function logSession(userId: string, workoutId: string) {
   const workout = await prisma.workout.findFirst({
@@ -22,14 +23,8 @@ export async function listSessions(userId: string) {
 }
 
 export async function getSessionsThisWeek(userId: string) {
-  const now = new Date();
-  const dow = now.getDay();
-  const weekStart = new Date(now);
-  weekStart.setDate(now.getDate() - (dow === 0 ? 6 : dow - 1));
-  weekStart.setHours(0, 0, 0, 0);
-
   return prisma.workoutSession.findMany({
-    where: { clerkUserId: userId, performedAt: { gte: weekStart } },
+    where: { clerkUserId: userId, performedAt: { gte: startOfWeek(new Date()) } },
     select: { performedAt: true },
   });
 }
