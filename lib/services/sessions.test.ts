@@ -18,6 +18,7 @@ import {
   logSession,
   listSessions,
   getSessionsThisWeek,
+  getStreak,
 } from "@/lib/services/sessions";
 
 const mockedWorkout = vi.mocked(prisma.workout);
@@ -110,5 +111,59 @@ describe("getSessionsThisWeek", () => {
     await getSessionsThisWeek("user_1");
 
     expect(weekStartUsed().getDate()).toBe(8);
+  });
+});
+
+describe("getStreak", () => {
+  // "Hoje" fixo numa quarta (2026-06-10). Semanas (segunda-feira):
+  //   atual = 08/06 · -1 = 01/06 · -2 = 25/05 · -3 = 18/05
+  const sessionsOn = (...dates: Date[]) =>
+    mockedSession.findMany.mockResolvedValue(
+      dates.map((performedAt) => ({ performedAt })) as never,
+    );
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 5, 10, 12, 0)); // quarta
+  });
+
+  it("sem sessões → 0", async () => {
+    sessionsOn();
+    expect(await getStreak("user_1")).toBe(0);
+  });
+
+  it("só esta semana → 1", async () => {
+    sessionsOn(new Date(2026, 5, 9)); // terça desta semana
+    expect(await getStreak("user_1")).toBe(1);
+  });
+
+  it("3 semanas consecutivas (atual, -1, -2) → 3", async () => {
+    sessionsOn(
+      new Date(2026, 5, 9), // atual
+      new Date(2026, 5, 3), // -1
+      new Date(2026, 4, 27), // -2
+    );
+    expect(await getStreak("user_1")).toBe(3);
+  });
+
+  it("conta apenas distintas: 2 sessões na mesma semana valem 1", async () => {
+    sessionsOn(new Date(2026, 5, 9), new Date(2026, 5, 11));
+    expect(await getStreak("user_1")).toBe(1);
+  });
+
+  it("buraco quebra a sequência: atual + -2 (faltou -1) → 1", async () => {
+    sessionsOn(new Date(2026, 5, 9), new Date(2026, 4, 27));
+    expect(await getStreak("user_1")).toBe(1);
+  });
+
+  it("semana atual em andamento sem treino não zera: -1 e -2 → 2", async () => {
+    // Nada nesta semana ainda; conta a partir da semana passada.
+    sessionsOn(new Date(2026, 5, 3), new Date(2026, 4, 27));
+    expect(await getStreak("user_1")).toBe(2);
+  });
+
+  it("sem treino nesta semana E na passada → 0 (graça é de só 1 semana)", async () => {
+    sessionsOn(new Date(2026, 4, 27)); // só -2
+    expect(await getStreak("user_1")).toBe(0);
   });
 });

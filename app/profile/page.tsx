@@ -1,6 +1,7 @@
 import { currentUser } from "@clerk/nextjs/server";
 import { auth } from "@clerk/nextjs/server";
 import { listWorkouts } from "@/lib/services/workouts";
+import { getStreak } from "@/lib/services/sessions";
 import { SignOutButton } from "@clerk/nextjs";
 import Link from "next/link";
 import Image from "next/image";
@@ -14,7 +15,10 @@ export default async function ProfilePage() {
   const user = await currentUser();
   const { userId } = await auth();
   if (!userId) throw new Error("Não autenticado");
-  const workouts = await listWorkouts(userId);
+  const [workouts, streak] = await Promise.all([
+    listWorkouts(userId),
+    getStreak(userId),
+  ]);
 
   const createdAt = user?.createdAt ? new Date(user.createdAt) : new Date();
   const memberSince = `${MONTHS_PT[createdAt.getMonth()]} ${createdAt.getFullYear()}`;
@@ -53,8 +57,12 @@ export default async function ProfilePage() {
           <p className="text-[11px] text-ink-3">Total treinos</p>
         </div>
         <div className="rounded-[10px] border border-line bg-surface p-3 text-center">
-          <p className="text-[18px] font-medium text-ink">—</p>
-          <p className="text-[11px] text-ink-3">Sequência</p>
+          <p className="text-[18px] font-medium text-ink">
+            {streak === 0 ? "—" : streak}
+          </p>
+          <p className="text-[11px] text-ink-3">
+            {streak === 1 ? "Semana seguida" : "Semanas seguidas"}
+          </p>
         </div>
       </div>
 
