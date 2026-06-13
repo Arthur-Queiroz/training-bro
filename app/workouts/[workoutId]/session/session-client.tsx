@@ -49,6 +49,12 @@ export function WorkoutSessionClient({
   async function handleFinish() {
     const res = await fetch(`/api/workouts/${workoutId}/sessions`, {
       method: "POST",
+      headers: { "Content-Type": "application/json" },
+      // Snapshot do checklist: o que foi marcado e o total no momento.
+      body: JSON.stringify({
+        completedExerciseIds: [...checked],
+        totalExercises: total,
+      }),
     });
     if (res.ok) {
       router.push("/");

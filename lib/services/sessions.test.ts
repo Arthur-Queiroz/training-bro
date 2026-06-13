@@ -40,17 +40,39 @@ describe("logSession", () => {
     expect(mockedSession.create).not.toHaveBeenCalled();
   });
 
-  it("registra a sessão quando o treino é do usuário", async () => {
+  it("registra a sessão com o snapshot do checklist", async () => {
     mockedWorkout.findFirst.mockResolvedValue({ id: "w1" } as never);
     mockedSession.create.mockResolvedValue({ id: "s1" } as never);
-    await logSession("user_1", "w1");
+    await logSession("user_1", "w1", {
+      completedExerciseIds: ["e1", "e2"],
+      totalExercises: 3,
+    });
     expect(mockedWorkout.findFirst).toHaveBeenCalledWith(
       expect.objectContaining({
         where: { id: "w1", clerkUserId: "user_1" },
       }),
     );
     expect(mockedSession.create).toHaveBeenCalledWith({
-      data: { clerkUserId: "user_1", workoutId: "w1" },
+      data: {
+        clerkUserId: "user_1",
+        workoutId: "w1",
+        completedExerciseIds: ["e1", "e2"],
+        totalExercises: 3,
+      },
+    });
+  });
+
+  it("sem input, grava snapshot vazio (defaults)", async () => {
+    mockedWorkout.findFirst.mockResolvedValue({ id: "w1" } as never);
+    mockedSession.create.mockResolvedValue({ id: "s1" } as never);
+    await logSession("user_1", "w1");
+    expect(mockedSession.create).toHaveBeenCalledWith({
+      data: {
+        clerkUserId: "user_1",
+        workoutId: "w1",
+        completedExerciseIds: [],
+        totalExercises: 0,
+      },
     });
   });
 });

@@ -91,6 +91,14 @@ export default async function HistoryPage() {
                             ))}
                           </div>
                         )}
+                        {/* "X de Y" só aparece em sessões registradas após o
+                            snapshot existir (totalExercises 0 = sessão antiga). */}
+                        {session.totalExercises > 0 && (
+                          <p className="text-[11px] text-ink-3 mt-1">
+                            {session.completedExerciseIds.length} de{" "}
+                            {session.totalExercises} exercícios
+                          </p>
+                        )}
                       </div>
                       <div className="text-right flex-shrink-0">
                         <p className="text-[12px] text-ink-2">{date}</p>
