@@ -1,5 +1,7 @@
 import Link from "next/link";
-import { getWorkout, updateWorkout } from "@/lib/actions/workouts";
+import { auth } from "@clerk/nextjs/server";
+import { getWorkout } from "@/lib/services/workouts";
+import { or404 } from "@/lib/or-404";
 import { WorkoutForm } from "@/components/workouts/workout-form";
 import { DeleteWorkoutButton } from "@/app/workouts/[workoutId]/delete-button";
 
@@ -8,8 +10,10 @@ export default async function EditWorkoutPage({
 }: {
   params: Promise<{ workoutId: string }>;
 }) {
+  const { userId } = await auth();
+  if (!userId) throw new Error("Não autenticado");
   const { workoutId } = await params;
-  const workout = await getWorkout(workoutId);
+  const workout = await or404(getWorkout(userId, workoutId));
 
   return (
     <div className="px-4 pt-4 pb-4 max-w-lg mx-auto lg:max-w-none lg:px-6 lg:pt-6">
@@ -36,7 +40,7 @@ export default async function EditWorkoutPage({
         Editar treino
       </h1>
 
-      <WorkoutForm action={updateWorkout} workout={workout} />
+      <WorkoutForm workout={workout} />
 
       <div className="mt-6 pt-4 border-t border-white/[0.06]">
         <DeleteWorkoutButton workoutId={workoutId} />

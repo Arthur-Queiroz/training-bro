@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    env:
+      # Dummy: prisma.config.ts exige a variável, mas lint/typecheck/test
+      # não tocam o banco (prisma generate é codegen offline, testes mockam o client).
+      DATABASE_URL: "postgresql://ci:ci@localhost:5432/ci"
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      # npm install em vez de npm ci: o lock é gerado no Windows e o npm omite
+      # entradas opcionais wasm de outras plataformas (npm/cli#4828), o que faz
+      # o npm ci falhar no runner Linux. npm install ainda respeita o lock.
+      - name: Instalar dependências (roda prisma generate via postinstall)
+        run: npm install --no-audit --no-fund
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Testes
+        run: npm test

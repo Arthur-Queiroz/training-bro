@@ -1,7 +1,8 @@
 import Link from "next/link";
 import Image from "next/image";
 import { currentUser } from "@clerk/nextjs/server";
-import { getWorkouts, getWorkoutSessionsThisWeek } from "@/lib/actions/workouts";
+import { listWorkouts } from "@/lib/services/workouts";
+import { getSessionsThisWeek } from "@/lib/services/sessions";
 import { getWorkoutPrimaryColor } from "@/lib/workout-colors";
 
 const DAY_LABELS = ["S", "T", "Q", "Q", "S", "S", "D"];
@@ -14,9 +15,11 @@ const DAYS_PT = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
 
 export default async function Home() {
   const user = await currentUser();
+  if (!user) throw new Error("Não autenticado");
+
   const [workouts, sessionsThisWeek] = await Promise.all([
-    getWorkouts(),
-    getWorkoutSessionsThisWeek(),
+    listWorkouts(user.id),
+    getSessionsThisWeek(user.id),
   ]);
 
   const now = new Date();

@@ -1,4 +1,5 @@
-import { getAllWorkoutSessions } from "@/lib/actions/workouts";
+import { auth } from "@clerk/nextjs/server";
+import { listSessions } from "@/lib/services/sessions";
 import { getWorkoutPrimaryColor } from "@/lib/workout-colors";
 
 const MONTHS_PT = [
@@ -16,7 +17,7 @@ function formatDate(date: Date) {
   return { date: `${day} ${month} ${year}`, time: `${hours}:${minutes}` };
 }
 
-function groupByMonth(sessions: Awaited<ReturnType<typeof getAllWorkoutSessions>>) {
+function groupByMonth(sessions: Awaited<ReturnType<typeof listSessions>>) {
   const groups: Record<string, typeof sessions> = {};
   for (const session of sessions) {
     const d = new Date(session.performedAt);
@@ -28,7 +29,9 @@ function groupByMonth(sessions: Awaited<ReturnType<typeof getAllWorkoutSessions>
 }
 
 export default async function HistoryPage() {
-  const sessions = await getAllWorkoutSessions();
+  const { userId } = await auth();
+  if (!userId) throw new Error("Não autenticado");
+  const sessions = await listSessions(userId);
   const grouped = groupByMonth(sessions);
 
   return (

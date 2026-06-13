@@ -1,5 +1,6 @@
 import { currentUser } from "@clerk/nextjs/server";
-import { getWorkouts } from "@/lib/actions/workouts";
+import { auth } from "@clerk/nextjs/server";
+import { listWorkouts } from "@/lib/services/workouts";
 import { SignOutButton } from "@clerk/nextjs";
 import Link from "next/link";
 import Image from "next/image";
@@ -11,7 +12,9 @@ const MONTHS_PT = [
 
 export default async function ProfilePage() {
   const user = await currentUser();
-  const workouts = await getWorkouts();
+  const { userId } = await auth();
+  if (!userId) throw new Error("Não autenticado");
+  const workouts = await listWorkouts(userId);
 
   const createdAt = user?.createdAt ? new Date(user.createdAt) : new Date();
   const memberSince = `${MONTHS_PT[createdAt.getMonth()]} ${createdAt.getFullYear()}`;

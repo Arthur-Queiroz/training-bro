@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { createWorkout } from "@/lib/actions/workouts";
 import { WorkoutForm } from "@/components/workouts/workout-form";
 
 export default function NewWorkoutPage() {
@@ -26,7 +25,7 @@ export default function NewWorkoutPage() {
       <h1 className="text-[16px] font-medium text-[#F0EDE6] mb-5">
         Novo Treino
       </h1>
-      <WorkoutForm action={createWorkout} />
+      <WorkoutForm />
     </div>
   );
 }

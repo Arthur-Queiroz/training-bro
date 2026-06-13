@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
-import { logWorkoutSession } from "@/lib/actions/workouts";
+import { useRouter } from "next/navigation";
 
 interface Exercise {
   id: string;
@@ -28,6 +28,7 @@ export function WorkoutSessionClient({
   exercises,
   color,
 }: Props) {
+  const router = useRouter();
   const [checked, setChecked] = useState<Set<string>>(new Set());
   const [isPending, startTransition] = useTransition();
 
@@ -45,9 +46,17 @@ export function WorkoutSessionClient({
   const allDone = total > 0 && done === total;
   const progress = total > 0 ? (done / total) * 100 : 0;
 
-  const handleFinish = () => {
-    startTransition(() => logWorkoutSession(workoutId));
-  };
+  async function handleFinish() {
+    const res = await fetch(`/api/workouts/${workoutId}/sessions`, {
+      method: "POST",
+    });
+    if (res.ok) {
+      router.push("/");
+      router.refresh();
+    } else {
+      alert("Erro ao registrar treino.");
+    }
+  }
 
   return (
     <div className="flex flex-col min-h-[calc(100vh-5rem)] max-w-lg mx-auto lg:max-w-none">
@@ -196,7 +205,7 @@ export function WorkoutSessionClient({
       {/* Footer */}
       <div className="sticky bottom-20 lg:bottom-0 px-4 pb-4 pt-3 lg:px-6 border-t border-white/[0.06] bg-[#0b0b0d] mt-4">
         <button
-          onClick={handleFinish}
+          onClick={() => startTransition(handleFinish)}
           disabled={isPending}
           className="w-full rounded-[8px] py-2.5 text-[13px] font-medium text-white transition-all disabled:opacity-50"
           style={{
