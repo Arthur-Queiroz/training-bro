@@ -3,12 +3,25 @@
 import "dotenv/config";
 import { defineConfig } from "prisma/config";
 
+// Este config é usado SÓ pela CLI do Prisma (migrate, studio) — o runtime
+// conecta por lib/prisma.ts. Migração precisa de conexão em modo SESSÃO:
+//   - DATABASE_URL é o pooler em modo transação (:6543) → trava no advisory
+//     lock da migração;
+//   - a conexão direta (db.<ref>.supabase.co) é IPv6-only e costuma ser
+//     inalcançável (P1001).
+// O caminho que funciona é o "session pooler": mesmo host do DATABASE_URL,
+// porta 5432. Derivamos trocando a porta; dá pra sobrescrever com
+// MIGRATE_DATABASE_URL se um dia o setup mudar.
+const runtimeUrl = process.env["DATABASE_URL"] ?? "";
+const migrationUrl =
+  process.env["MIGRATE_DATABASE_URL"] ?? runtimeUrl.replace(":6543/", ":5432/");
+
 export default defineConfig({
   schema: "prisma/schema.prisma",
   migrations: {
     path: "prisma/migrations",
   },
   datasource: {
-    url: process.env["DATABASE_URL"],
+    url: migrationUrl,
   },
 });

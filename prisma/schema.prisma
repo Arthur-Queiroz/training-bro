@@ -22,11 +22,16 @@ model Workout {
 }
 
 model WorkoutSession {
-  id          String   @id @default(uuid()) @db.Uuid
-  clerkUserId String   @map("clerk_user_id")
-  workoutId   String   @map("workout_id") @db.Uuid
-  performedAt DateTime @default(now()) @map("performed_at") @db.Timestamptz
-  workout     Workout  @relation(fields: [workoutId], references: [id], onDelete: Cascade)
+  id                   String   @id @default(uuid()) @db.Uuid
+  clerkUserId          String   @map("clerk_user_id")
+  workoutId            String   @map("workout_id") @db.Uuid
+  performedAt          DateTime @default(now()) @map("performed_at") @db.Timestamptz
+  // Snapshot do checklist na conclusão: quais exercícios foram marcados e
+  // quantos havia no treino. Guardar o total aqui congela o histórico — editar
+  // ou excluir exercícios depois não muda o "8 de 10" de uma sessão antiga.
+  completedExerciseIds String[] @default([]) @map("completed_exercise_ids") @db.Uuid
+  totalExercises       Int      @default(0) @map("total_exercises")
+  workout              Workout  @relation(fields: [workoutId], references: [id], onDelete: Cascade)
 
   @@index([clerkUserId])
   @@index([workoutId])

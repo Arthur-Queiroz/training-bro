@@ -2,7 +2,18 @@ import { prisma } from "@/lib/prisma";
 import { NotFoundError } from "@/lib/errors";
 import { startOfWeek } from "@/lib/week";
 
-export async function logSession(userId: string, workoutId: string) {
+export interface LogSessionInput {
+  /** IDs dos exercícios marcados como feitos no checklist da sessão. */
+  completedExerciseIds?: string[];
+  /** Quantos exercícios o treino tinha no momento (congela o "X de Y"). */
+  totalExercises?: number;
+}
+
+export async function logSession(
+  userId: string,
+  workoutId: string,
+  input: LogSessionInput = {},
+) {
   const workout = await prisma.workout.findFirst({
     where: { id: workoutId, clerkUserId: userId },
     select: { id: true },
@@ -10,7 +21,12 @@ export async function logSession(userId: string, workoutId: string) {
   if (!workout) throw new NotFoundError("Treino não encontrado");
 
   return prisma.workoutSession.create({
-    data: { clerkUserId: userId, workoutId },
+    data: {
+      clerkUserId: userId,
+      workoutId,
+      completedExerciseIds: input.completedExerciseIds ?? [],
+      totalExercises: input.totalExercises ?? 0,
+    },
   });
 }
 
