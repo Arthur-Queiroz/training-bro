@@ -4,6 +4,7 @@ import { getWorkout } from "@/lib/services/workouts";
 import { or404 } from "@/lib/or-404";
 import { ExerciseCard } from "@/components/exercises/exercise-card";
 import { getWorkoutPrimaryColor } from "@/lib/workout-colors";
+import { ShareWorkoutButton } from "./share-button";
 
 export default async function WorkoutDetailPage({
   params,
@@ -93,6 +94,7 @@ export default async function WorkoutDetailPage({
       {/* Bottom actions */}
       <div className="sticky bottom-20 lg:bottom-0 px-4 pb-4 pt-3 lg:px-6 border-t border-line bg-base mt-4">
         <div className="flex gap-2">
+          <ShareWorkoutButton workoutId={workoutId} />
           <Link
             href={`/workouts/${workoutId}/edit`}
             className="rounded-[8px] border border-line bg-surface px-4 py-2.5 text-center text-[13px] font-medium text-ink transition-colors hover:bg-surface-2"
