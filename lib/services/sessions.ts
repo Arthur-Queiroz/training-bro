@@ -85,3 +85,44 @@ export async function getStreak(userId: string): Promise<number> {
   }
   return streak;
 }
+
+export interface SessionStats {
+  /** Total de treinos registrados. */
+  total: number;
+  /** Treinos no mês corrente. */
+  thisMonth: number;
+  /**
+   * Grupos musculares por frequência, do mais treinado ao menos. Cada sessão
+   * conta para todos os grupos do seu treino (um treino "Peito e Tríceps"
+   * soma 1 em cada). Ordenado desc por contagem.
+   */
+  muscleGroups: { group: string; count: number }[];
+}
+
+export async function getSessionStats(userId: string): Promise<SessionStats> {
+  const sessions = await prisma.workoutSession.findMany({
+    where: { clerkUserId: userId },
+    select: {
+      performedAt: true,
+      workout: { select: { muscleGroups: true } },
+    },
+  });
+
+  const now = new Date();
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+  let thisMonth = 0;
+  const counts = new Map<string, number>();
+  for (const session of sessions) {
+    if (session.performedAt >= monthStart) thisMonth++;
+    for (const group of session.workout.muscleGroups) {
+      counts.set(group, (counts.get(group) ?? 0) + 1);
+    }
+  }
+
+  const muscleGroups = [...counts.entries()]
+    .map(([group, count]) => ({ group, count }))
+    .sort((a, b) => b.count - a.count);
+
+  return { total: sessions.length, thisMonth, muscleGroups };
+}

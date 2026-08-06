@@ -1,6 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
-import { listSessions } from "@/lib/services/sessions";
+import { listSessions, getSessionStats } from "@/lib/services/sessions";
 import { getWorkoutPrimaryColor } from "@/lib/workout-colors";
+import { SessionStatsCard } from "@/components/history/session-stats";
 
 const MONTHS_PT = [
   "jan", "fev", "mar", "abr", "mai", "jun",
@@ -31,7 +32,10 @@ function groupByMonth(sessions: Awaited<ReturnType<typeof listSessions>>) {
 export default async function HistoryPage() {
   const { userId } = await auth();
   if (!userId) throw new Error("Não autenticado");
-  const sessions = await listSessions(userId);
+  const [sessions, stats] = await Promise.all([
+    listSessions(userId),
+    getSessionStats(userId),
+  ]);
   const grouped = groupByMonth(sessions);
 
   return (
@@ -55,7 +59,9 @@ export default async function HistoryPage() {
           </p>
         </div>
       ) : (
-        <div className="space-y-5">
+        <>
+          <SessionStatsCard stats={stats} />
+          <div className="space-y-5">
           {Object.entries(grouped).map(([month, monthSessions]) => (
             <div key={month}>
               <p className="text-[11px] font-medium uppercase tracking-[0.5px] text-ink-3 mb-2">
@@ -110,7 +116,8 @@ export default async function HistoryPage() {
               </div>
             </div>
           ))}
-        </div>
+          </div>
+        </>
       )}
     </div>
   );
